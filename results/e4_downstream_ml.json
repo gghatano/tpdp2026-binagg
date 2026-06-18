@@ -1,0 +1,244 @@
+{
+  "experiment": "E4 best-effort: downstream-ML utility of synthetic data (paper Section 5.2.2, Table 3)",
+  "metric": "PRIMARY RelMSE_var = MSE/Var(y_test) = 1-R^2 (matches paper Table 3 scale); secondary RelMSE_ynorm = ||y_pred-y||^2/||y||^2 (Table 2 / E3-E5 def, for continuity)",
+  "metric_note": "Table 3's Original scale (Abalone 0.487, AirQuality 0.489) is reproduced only by the variance normalization, not the ||y||^2 one (0.044 vs 0.33). See script header.",
+  "protocol": {
+    "split": "80/20 train/test, synthetic from train only, eval on real test",
+    "models": [
+      "GradBoost(XGB-stand-in)",
+      "RandomForest",
+      "SVR",
+      "MLP"
+    ],
+    "privacy": "eps=1.0, delta=1/n^1.1 -> mu via mu_from_eps_delta",
+    "n_reps": 10
+  },
+  "deviations": "XGBoost->HistGradientBoosting; competitors quoted from paper only; SVR/MLP scaled.",
+  "datasets": {
+    "Abalone": {
+      "n": 4177,
+      "d": 10,
+      "n_train": 3341,
+      "n_test": 836,
+      "eps": 1.0,
+      "delta": 0.00010400376880739119,
+      "mu": 0.31487237501494764,
+      "n_reps_ok": 10,
+      "paper": {
+        "Original": 0.487,
+        "BinAgg": 0.731
+      },
+      "original_per_model": {
+        "GradBoost(XGB-stand-in)": 0.44281666739213565,
+        "RandomForest": 0.4310575532645395,
+        "SVR": 0.4482490514376553,
+        "MLP": 0.41016984551968866
+      },
+      "original_mean": 0.4330732794035048,
+      "original_mean_ynorm": 0.043716702111008296,
+      "binagg_per_model_mean": {
+        "GradBoost(XGB-stand-in)": 0.8713974902471013,
+        "RandomForest": 0.8540868322196683,
+        "SVR": 0.7269614585107279,
+        "MLP": 1.15982978309506
+      },
+      "binagg_per_model_std": {
+        "GradBoost(XGB-stand-in)": 0.04685624936917395,
+        "RandomForest": 0.057943520073807424,
+        "SVR": 0.03244239155157523,
+        "MLP": 0.10991544352366073
+      },
+      "binagg_mean": 0.9030688910181393,
+      "binagg_mean_ynorm": 0.0911605392711724,
+      "status": "ok",
+      "source": "openml {'name': 'abalone'}",
+      "preprocessing_note": "Sex one-hot (3 cols) + 7 numeric = 10; target=Rings.",
+      "features": [
+        "Sex_F",
+        "Sex_I",
+        "Sex_M",
+        "Length",
+        "Diameter",
+        "Height",
+        "Whole_weight",
+        "Shucked_weight",
+        "Viscera_weight",
+        "Shell_weight"
+      ]
+    },
+    "WineQuality": {
+      "n": 6497,
+      "d": 12,
+      "n_train": 5197,
+      "n_test": 1300,
+      "eps": 1.0,
+      "delta": 6.397581785841853e-05,
+      "mu": 0.3033950067516188,
+      "n_reps_ok": 10,
+      "paper": {
+        "Original": 0.628,
+        "BinAgg": 1.195
+      },
+      "original_per_model": {
+        "GradBoost(XGB-stand-in)": 0.3167109597715665,
+        "RandomForest": 0.28593708079990665,
+        "SVR": 0.3604032753265981,
+        "MLP": 0.3808801422336044
+      },
+      "original_mean": 0.3359828645329189,
+      "original_mean_ynorm": 0.022063374751479868,
+      "binagg_per_model_mean": {
+        "GradBoost(XGB-stand-in)": 0.8029587017847776,
+        "RandomForest": 0.7524637506093221,
+        "SVR": 0.7327238724507683,
+        "MLP": 1.5940280828108182
+      },
+      "binagg_per_model_std": {
+        "GradBoost(XGB-stand-in)": 0.1037451864689355,
+        "RandomForest": 0.035542086178259026,
+        "SVR": 0.07720921548119333,
+        "MLP": 0.32319207903658137
+      },
+      "binagg_mean": 0.9705436019139215,
+      "binagg_mean_ynorm": 0.06373380747094587,
+      "status": "ok",
+      "source": "openml {'name': 'wine-quality-red'} + openml {'name': 'wine-quality-white'}",
+      "preprocessing_note": "red+white stacked (6497); 11 chem + type = 12; target=quality.",
+      "features": [
+        "fixed_acidity",
+        "volatile_acidity",
+        "citric_acid",
+        "residual_sugar",
+        "chlorides",
+        "free_sulfur_dioxide",
+        "total_sulfur_dioxide",
+        "density",
+        "pH",
+        "sulphates",
+        "alcohol",
+        "type_white"
+      ]
+    },
+    "AirQuality": {
+      "n": 9357,
+      "d": 12,
+      "n_train": 7485,
+      "n_test": 1872,
+      "eps": 1.0,
+      "delta": 4.2830161063952196e-05,
+      "mu": 0.29471182584466044,
+      "n_reps_ok": 10,
+      "paper": {
+        "Original": 0.489,
+        "BinAgg": 0.584
+      },
+      "original_per_model": {
+        "GradBoost(XGB-stand-in)": 0.4002433586737587,
+        "RandomForest": 0.383508705159136,
+        "SVR": 0.5866657902865278,
+        "MLP": 0.4612057606605523
+      },
+      "original_mean": 0.45790590369499373,
+      "original_mean_ynorm": 0.3872518208744258,
+      "binagg_per_model_mean": {
+        "GradBoost(XGB-stand-in)": 0.8676971971809195,
+        "RandomForest": 0.8791517176205804,
+        "SVR": 0.8390242932974207,
+        "MLP": 0.8480699933406222
+      },
+      "binagg_per_model_std": {
+        "GradBoost(XGB-stand-in)": 0.04262142510554474,
+        "RandomForest": 0.05291024788703107,
+        "SVR": 0.017969249780653243,
+        "MLP": 0.0487154212959546
+      },
+      "binagg_mean": 0.8584858003598856,
+      "binagg_mean_ynorm": 0.7260229376855689,
+      "status": "ok",
+      "source": "local AirQualityUCI.csv",
+      "preprocessing_note": "-200 missing sentinel KEPT; all 12 features (paper-faithful).",
+      "features": [
+        "PT08.S1(CO)",
+        "NMHC(GT)",
+        "C6H6(GT)",
+        "PT08.S2(NMHC)",
+        "NOx(GT)",
+        "PT08.S3(NOx)",
+        "NO2(GT)",
+        "PT08.S4(NO2)",
+        "PT08.S5(O3)",
+        "T",
+        "RH",
+        "AH"
+      ]
+    },
+    "Appliances": {
+      "n": 19735,
+      "d": 27,
+      "n_train": 15788,
+      "n_test": 3947,
+      "eps": 1.0,
+      "delta": 1.8846866582995354e-05,
+      "mu": 0.27884086594987684,
+      "n_reps_ok": 10,
+      "paper": {
+        "Original": 0.683,
+        "BinAgg": 1.49
+      },
+      "original_per_model": {
+        "GradBoost(XGB-stand-in)": 0.5931939727607919,
+        "RandomForest": 0.5177770053963153,
+        "SVR": 1.030452811760479,
+        "MLP": 0.792465401636433
+      },
+      "original_mean": 0.7334722978885048,
+      "original_mean_ynorm": 0.3930232331530873,
+      "binagg_per_model_mean": {
+        "GradBoost(XGB-stand-in)": 1.6558636123349069,
+        "RandomForest": 1.3528480535040106,
+        "SVR": 1.0053402930864177,
+        "MLP": 3.2473203039007297
+      },
+      "binagg_per_model_std": {
+        "GradBoost(XGB-stand-in)": 0.10975196645534047,
+        "RandomForest": 0.06421533375463423,
+        "SVR": 0.015662595039020157,
+        "MLP": 0.3131289570402227
+      },
+      "binagg_mean": 1.8153430657065162,
+      "binagg_mean_ynorm": 0.9727320350338132,
+      "status": "ok",
+      "source": "openml {'name': 'Appliances_Energy_Prediction'}",
+      "preprocessing_note": "no date col; all 27 features (incl rv1/rv2); target=Appliances.",
+      "features": [
+        "lights",
+        "T1",
+        "RH_1",
+        "T2",
+        "RH_2",
+        "T3",
+        "RH_3",
+        "T4",
+        "RH_4",
+        "T5",
+        "RH_5",
+        "T6",
+        "RH_6",
+        "T7",
+        "RH_7",
+        "T8",
+        "RH_8",
+        "T9",
+        "RH_9",
+        "T_out",
+        "Press_mm_hg",
+        "RH_out",
+        "Windspeed",
+        "Visibility",
+        "Tdewpoint",
+        "rv1",
+        "rv2"
+      ]
+    }
+  }
+}

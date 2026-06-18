@@ -227,8 +227,9 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
 研究上・運用上の限界を正直に列挙する（一部は[発展実験](extensions.html)・[補足実験](supplementary.html)で着手済み）。
 未着手の実験は GitHub Issues で追跡する（[gghatano/tpdp2026-binagg/issues](https://github.com/gghatano/tpdp2026-binagg/issues)）。
 
-1. **合成データの下流 ML 評価（論文 §5.2.2）**: 論文は合成データを複数の DP-SDG 手法・ML モデルで下流評価する。
-   本追試は未実施（→ [#1](https://github.com/gghatano/tpdp2026-binagg/issues/1)）。
+1. **合成データの下流 ML 評価（論文 §5.2.2）**: 4 データ（Abalone/Wine/Air Quality/Appliances）で合成データから
+   非線形 ML（GradBoost/RF/SVR/MLP）を学習し実テストで評価し、Table 3 の Original/BinAgg と同オーダーを best-effort で
+   再現した（[発展実験](extensions.html)、→ [#1](https://github.com/gghatano/tpdp2026-binagg/issues/1)）。残るは競合 DP-SDG 手法（AIM 等）の実装。
 2. **比較手法**: **AdaSSP** は best-effort で追加し優劣 BinAgg < AdaSSP を再現（[発展実験](extensions.html)）。
    **DP-GD** はチューニング感度・コストのため未実施（→ [#2](https://github.com/gghatano/tpdp2026-binagg/issues/2)）。
 3. **データセットの広がり**: 同定できた **Abalone・Appliances** は論文値をほぼ再現、**Wine** は前処理差で乖離。

@@ -1,0 +1,5 @@
+dataset,status,n,d,mu,original_relmse_var,binagg_relmse_var,paper_original,paper_binagg,original_relmse_ynorm,binagg_relmse_ynorm
+Abalone,ok,4177,10,0.315,0.4331,0.9031,0.487,0.731,0.0437,0.0912
+WineQuality,ok,6497,12,0.303,0.3360,0.9705,0.628,1.195,0.0221,0.0637
+AirQuality,ok,9357,12,0.295,0.4579,0.8585,0.489,0.584,0.3873,0.7260
+Appliances,ok,19735,27,0.279,0.7335,1.8153,0.683,1.49,0.3930,0.9727
