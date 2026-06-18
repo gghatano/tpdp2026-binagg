@@ -5,7 +5,8 @@ Statistical Guarantees* (Lin, Slavković & Bhoomireddy, AISTATS 2026,
 [arXiv:2510.16974](https://arxiv.org/abs/2510.16974)) の DP 線形回帰＋統計的保証付き
 合成データ生成を、公式実装 [BinAgg](https://github.com/Shuronglin/BinAgg) で再現追試する。
 
-- **レポート本体**: [content/REPORT.md](content/REPORT.md)
+- **公開レポート (GitHub Pages)**: https://gghatano.github.io/tpdp2026-binagg/
+- **レポート本体 (Markdown)**: [content/REPORT.md](content/REPORT.md)
 - **実験計画**: [docs/plans/experiment-plan.md](docs/plans/experiment-plan.md)
 - **元 Issue**: https://github.com/pwscup/tpdp2026/issues/16
 
@@ -21,6 +22,16 @@ uv pip install --python .venv -r requirements.txt \
 ```
 
 結果は `results/*.json|*.csv` と `results/figures/*.png` に出力される（シード固定で再現可能）。
+
+## サイトのビルド & 公開
+
+```bash
+uv pip install --python .venv markdown   # ビルド依存
+.venv/Scripts/python.exe scripts/03_build_html.py   # content/*.md -> htmls/*.html（図は base64 埋め込み）
+```
+
+`main` への push で `.github/workflows/deploy-pages.yml` が `htmls/` を GitHub Pages へデプロイする。
+ページ構成は `scripts/03_build_html.py` の `PAGES` テーブルが単一の真実。
 
 ## 構成
 
