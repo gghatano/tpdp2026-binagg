@@ -1,5 +1,9 @@
 # BinAgg 再現追試レポート
 
+🔗 **関連リンク**:
+[調査タスク全体像 (PWS Cup / tpdp2026)](https://pwscup.github.io/tpdp2026/) ·
+[本レポートのリポジトリ (gghatano/tpdp2026-binagg)](https://github.com/gghatano/tpdp2026-binagg)
+
 差分プライバシー下の線形回帰手法 **BinAgg** [[1]](#ref1) の公式実装 [[2]](#ref2) を固定環境で動かし、
 論文の中核的な主張（妥当な信頼区間・回帰の保証で測る合成データの有用性）を再現追試した実証研究レポートである。
 対象は tpdp2026 Issue #16。
@@ -221,18 +225,21 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
 ## 7. 残課題
 
 研究上・運用上の限界を正直に列挙する（一部は[発展実験](extensions.html)・[補足実験](supplementary.html)で着手済み）。
+未着手の実験は GitHub Issues で追跡する（[gghatano/tpdp2026-binagg/issues](https://github.com/gghatano/tpdp2026-binagg/issues)）。
 
-1. **比較手法**: 競合手法のうち **AdaSSP** は best-effort で追加し、優劣 BinAgg < AdaSSP を再現した（[発展実験](extensions.html)）。
-   **DP-GD** はチューニング感度・コストのため未実施。
-2. **データセットの広がり**: 論文 D1–D9 のうち、同定できた **Abalone・Wine・Appliances** を追試（[発展実験](extensions.html)。
-   Abalone・Appliances は論文値をほぼ再現、Wine は前処理差で値が乖離）。同定困難な D1/D2/D3/D5/D9 は未実施。
-   反復は論文と同じ **100** に揃えた。
-3. **漸近信頼区間の有限標本近似**: 被覆率が 0.95 を僅かに下回る点について、$n$・bin 数を増やした感度分析は未実施。
-4. **bounds の与え方**: 実データでは論文に倣い non-private な bounds を用いた（DP ではない）。bounds を
-   private に推定する経路（予算の一部を割り当てる方法）は評価していない。
-5. **悪条件データでの係数推定**: 予測 RelMSE は頑健だが、係数レベルの推定は悪条件な実計画で不安定になる。
-   **標準化で条件数を約 400 分の 1 に下げ係数を安定化できる**が、切片なしモデルでは予測精度とトレードオフになる
-   ことを確認した（[補足実験](supplementary.html)）。共線性整理・次元削減・切片付きモデルが今後の課題。
+1. **合成データの下流 ML 評価（論文 §5.2.2）**: 論文は合成データを複数の DP-SDG 手法・ML モデルで下流評価する。
+   本追試は未実施（→ [#1](https://github.com/gghatano/tpdp2026-binagg/issues/1)）。
+2. **比較手法**: **AdaSSP** は best-effort で追加し優劣 BinAgg < AdaSSP を再現（[発展実験](extensions.html)）。
+   **DP-GD** はチューニング感度・コストのため未実施（→ [#2](https://github.com/gghatano/tpdp2026-binagg/issues/2)）。
+3. **データセットの広がり**: 同定できた **Abalone・Appliances** は論文値をほぼ再現、**Wine** は前処理差で乖離。
+   同定困難な D1/D2/D3/D5/D9 は未実施（→ [#3](https://github.com/gghatano/tpdp2026-binagg/issues/3)）。反復は論文と同じ **100** に揃えた。
+4. **漸近信頼区間の有限標本近似**: 被覆率が 0.95 を僅かに下回る点の、$n$・bin 数を増やした感度分析は未実施
+   （→ [#4](https://github.com/gghatano/tpdp2026-binagg/issues/4)）。
+5. **bounds の与え方**: 実データでは論文に倣い non-private な bounds を用いた（DP ではない）。bounds を
+   private に推定する経路は未評価（→ [#5](https://github.com/gghatano/tpdp2026-binagg/issues/5)）。
+6. **悪条件データでの係数推定**: 予測 RelMSE は頑健だが係数レベルは悪条件で不安定。標準化で条件数を約 400 分の 1 に
+   下げ安定化できるが切片なしでは予測精度とトレードオフ（[補足実験](supplementary.html)）。切片付き・共線性整理・
+   次元削減が今後の課題（→ [#6](https://github.com/gghatano/tpdp2026-binagg/issues/6)）。
 
 ---
 

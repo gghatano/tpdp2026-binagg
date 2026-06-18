@@ -100,6 +100,9 @@ article{padding:12px 18px 40px}}
 </div>
 </nav>
 <article><h1 id="binagg">BinAgg 再現追試レポート</h1>
+<p>🔗 <strong>関連リンク</strong>:
+<a href="https://pwscup.github.io/tpdp2026/">調査タスク全体像 (PWS Cup / tpdp2026)</a> ·
+<a href="https://github.com/gghatano/tpdp2026-binagg">本レポートのリポジトリ (gghatano/tpdp2026-binagg)</a></p>
 <p>差分プライバシー下の線形回帰手法 <strong>BinAgg</strong> <a href="#ref1">[1]</a> の公式実装 <a href="#ref2">[2]</a> を固定環境で動かし、
 論文の中核的な主張（妥当な信頼区間・回帰の保証で測る合成データの有用性）を再現追試した実証研究レポートである。
 対象は tpdp2026 Issue #16。</p>
@@ -441,19 +444,22 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
 前処理（欠損の削除・補完）や指標の選択が結果を大きく動かす点は<a href="supplementary.html">補足実験</a>・<a href="extensions.html">発展実験</a>で示した。</p>
 <hr />
 <h2 id="7">7. 残課題</h2>
-<p>研究上・運用上の限界を正直に列挙する（一部は<a href="extensions.html">発展実験</a>・<a href="supplementary.html">補足実験</a>で着手済み）。</p>
+<p>研究上・運用上の限界を正直に列挙する（一部は<a href="extensions.html">発展実験</a>・<a href="supplementary.html">補足実験</a>で着手済み）。
+未着手の実験は GitHub Issues で追跡する（<a href="https://github.com/gghatano/tpdp2026-binagg/issues">gghatano/tpdp2026-binagg/issues</a>）。</p>
 <ol>
-<li><strong>比較手法</strong>: 競合手法のうち <strong>AdaSSP</strong> は best-effort で追加し、優劣 BinAgg &lt; AdaSSP を再現した（<a href="extensions.html">発展実験</a>）。
-   <strong>DP-GD</strong> はチューニング感度・コストのため未実施。</li>
-<li><strong>データセットの広がり</strong>: 論文 D1–D9 のうち、同定できた <strong>Abalone・Wine・Appliances</strong> を追試（<a href="extensions.html">発展実験</a>。
-   Abalone・Appliances は論文値をほぼ再現、Wine は前処理差で値が乖離）。同定困難な D1/D2/D3/D5/D9 は未実施。
-   反復は論文と同じ <strong>100</strong> に揃えた。</li>
-<li><strong>漸近信頼区間の有限標本近似</strong>: 被覆率が 0.95 を僅かに下回る点について、<span class="arithmatex">\(n\)</span>・bin 数を増やした感度分析は未実施。</li>
+<li><strong>合成データの下流 ML 評価（論文 §5.2.2）</strong>: 論文は合成データを複数の DP-SDG 手法・ML モデルで下流評価する。
+   本追試は未実施（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/1">#1</a>）。</li>
+<li><strong>比較手法</strong>: <strong>AdaSSP</strong> は best-effort で追加し優劣 BinAgg &lt; AdaSSP を再現（<a href="extensions.html">発展実験</a>）。
+   <strong>DP-GD</strong> はチューニング感度・コストのため未実施（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/2">#2</a>）。</li>
+<li><strong>データセットの広がり</strong>: 同定できた <strong>Abalone・Appliances</strong> は論文値をほぼ再現、<strong>Wine</strong> は前処理差で乖離。
+   同定困難な D1/D2/D3/D5/D9 は未実施（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/3">#3</a>）。反復は論文と同じ <strong>100</strong> に揃えた。</li>
+<li><strong>漸近信頼区間の有限標本近似</strong>: 被覆率が 0.95 を僅かに下回る点の、<span class="arithmatex">\(n\)</span>・bin 数を増やした感度分析は未実施
+   （→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/4">#4</a>）。</li>
 <li><strong>bounds の与え方</strong>: 実データでは論文に倣い non-private な bounds を用いた（DP ではない）。bounds を
-   private に推定する経路（予算の一部を割り当てる方法）は評価していない。</li>
-<li><strong>悪条件データでの係数推定</strong>: 予測 RelMSE は頑健だが、係数レベルの推定は悪条件な実計画で不安定になる。
-   <strong>標準化で条件数を約 400 分の 1 に下げ係数を安定化できる</strong>が、切片なしモデルでは予測精度とトレードオフになる
-   ことを確認した（<a href="supplementary.html">補足実験</a>）。共線性整理・次元削減・切片付きモデルが今後の課題。</li>
+   private に推定する経路は未評価（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/5">#5</a>）。</li>
+<li><strong>悪条件データでの係数推定</strong>: 予測 RelMSE は頑健だが係数レベルは悪条件で不安定。標準化で条件数を約 400 分の 1 に
+   下げ安定化できるが切片なしでは予測精度とトレードオフ（<a href="supplementary.html">補足実験</a>）。切片付き・共線性整理・
+   次元削減が今後の課題（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/6">#6</a>）。</li>
 </ol>
 <hr />
 <h2 id="8">8. 結論</h2>
