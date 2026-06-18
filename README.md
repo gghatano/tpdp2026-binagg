@@ -67,4 +67,4 @@ uv pip install --python .venv markdown pymdown-extensions   # ビルド依存
 |---|---|
 | E1 | BinAgg の 95% CI 被覆率 0.92–0.93（公称 0.95 近接）／素朴 CI は 0.08–0.32 に崩壊 |
 | E2 | 合成データへ素朴 OLS=相対誤差 0.58→0.06、BinAgg 補正=0.09→0.02（OLS(元) 0.003 に接近） |
-| E3 | `-200` 欠損除去＋NMHC(GT)除外で浄化(n=6941,d=11)。合成モーメント誤差が μ で単調改善。実データ計画の悪条件性(cond≈4e8)で係数レベルは不安定 |
+| E3 | 論文準拠(D7=Air Quality, n=9357,d=12, 予測誤差RelMSE, non-private bounds)。μ=1 で OLS=0.441(論文と完全一致)・BinAgg=0.450(論文0.463)を**再現** |

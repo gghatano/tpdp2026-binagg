@@ -81,8 +81,9 @@ article{padding:12px 18px 40px}}
 <ul>
 <li><a href="#1">1. データ概要</a></li>
 <li><a href="#2-200">2. 欠損値センチネル -200 の落とし穴（本追試の重要発見）</a></li>
-<li><a href="#3-200">3. 採用した前処理（-200 の除去）</a><ul>
-<li><a href="#31">3.1 浄化しても残る課題: 設計行列の悪条件性</a></li>
+<li><a href="#3">3. 採用した前処理（論文準拠）</a><ul>
+<li><a href="#31-200">3.1 ロバストネス比較（逸脱・参考）: -200 を除去すると</a></li>
+<li><a href="#32">3.2 残る課題: 設計行列の悪条件性</a></li>
 </ul>
 </li>
 <li><a href="#4-bounds">4. bounds（定義域の上下限）の与え方とドメイン知識</a></li>
@@ -187,42 +188,49 @@ article{padding:12px 18px 40px}}
 \bar{y}_{\text{clip}} = 1.766,\quad s_{\text{clip}} = 1.554
 \]</div>
 <p>生の平均が負になっているのは、本来 0–15 程度の濃度に大量の <code>-200</code> が混ざるためで、物理的にあり得ない値である。</p>
-<p>具体的な悪影響は 2 系統に分かれる。</p>
+<p>この <code>-200</code> は、<strong>何を指標にするか</strong>で影響が変わる。</p>
 <ul>
-<li><strong>(a) 合成データのモーメント比較が無意味になる。</strong> DP 合成側はクリップ後の妥当な範囲で値を出すのに、参照を生の <span class="arithmatex">\(y\)</span> にすると mean 誤差が 36 程度の巨大値になる。これは手法の良し悪しではなく、参照側の汚染を見ているだけである。</li>
-<li><strong>(b) 非プライベート OLS 参照そのものが汚染される。</strong> <code>-200</code> を含む行で最小二乗を解くと係数が引っ張られる（例: AH 係数が <span class="arithmatex">\(-0.895\)</span> といった、汚染下でしか出ない値になる）。DP 経路は bounds クリップで <code>-200</code> の一部が遮蔽されるため被害が軽く見えるが、これは本質的な解決ではなく、たまたまクリップが効いているだけである。</li>
+<li><strong>モーメントや係数を直接比較する指標は汚染される</strong>: 生の <span class="arithmatex">\(y\)</span> を基準に合成データの平均を比べると無意味な巨大誤差（mean 誤差 36 程度）になり、<code>-200</code> を含むまま OLS を解くと係数も引っ張られる（例: AH 係数 <span class="arithmatex">\(-0.895\)</span>）。</li>
+<li><strong>予測誤差（RelMSE）は頑健</strong>: 論文 <a href="#ref1">[1]</a> は実データ評価で <code>-200</code> を残したまま、予測誤差 <span class="arithmatex">\(\mathrm{RelMSE}=\lVert X\hat\beta-y\rVert_2^2/\lVert y\rVert_2^2\)</span> を用いる。DP 推定も OLS も<strong>同じ（汚染を含む）<span class="arithmatex">\(y\)</span> を予測する</strong>ため、<code>-200</code> の影響が分子・分母および両手法に等しく乗り、相対比較が頑健に保たれる。</li>
 </ul>
 <blockquote>
-<p>💡 推奨: <code>-200</code> は読み込み直後に <code>NaN</code> へ置換し（<code>df.replace(-200, np.nan)</code>）、各列で欠損行を落としてから一切の統計・回帰・参照計算に入る。クリップは bounds 違反の救済策であって、欠損除去の代替にはならない。</p>
+<p>💡 教訓: 「データの罠」そのものより、<strong>指標の選び方</strong>が再現性を左右する。汚染や悪条件があっても、両手法が同じ対象を予測する RelMSE なら公平な比較が成り立つ。本追試は当初これを誤り、係数誤差で評価して不安定な結果を得た（<a href="faq.html">QA・メモ</a>・本文 §6 参照）。</p>
 </blockquote>
-<h2 id="3-200">3. 採用した前処理（<code>-200</code> の除去）</h2>
-<p>本追試の E3 は、以下の前処理を<strong>実際に適用</strong>している（<code>scripts/03_real_airquality.py</code>）。</p>
+<h2 id="3">3. 採用した前処理（論文準拠）</h2>
+<p>E3 は<strong>論文の実データ設定（D7）に準拠</strong>する（<code>scripts/03_real_airquality.py</code>、計画は <code>docs/plans/E3-paper-faithful.md</code>）。</p>
 <ol>
-<li><strong>NMHC(GT) 列を除外する</strong>。この列はこのデータセットで約 9 割（8443/9357 行）が <code>-200</code>＝欠損であり、
-   行除去で対処すると標本がほぼ消える。欠損が支配的な特徴は<strong>列ごと落とす</strong>のが定石である。</li>
-<li>残る列について <strong><code>-200</code> を <code>NaN</code> に置換し、いずれかの使用列が欠損の行を削除する</strong>。</li>
-<li>その結果、<span class="arithmatex">\(n=6941\)</span>・<span class="arithmatex">\(d=11\)</span> のクリーンなデータが得られる（例ベースラインの 9357 行から減少）。</li>
-<li>浄化後のデータで、非プライベート OLS 参照・DP 回帰・合成データの<strong>すべてを計算する</strong>。</li>
+<li><code>;</code> 区切り・カンマ小数を変換し <code>to_numeric</code> + <code>dropna</code> のみ。<strong><code>-200</code> は残し、全 12 特徴を使う</strong>（<span class="arithmatex">\(n=9357,d=12\)</span>）。</li>
+<li>指標は<strong>予測誤差 RelMSE</strong>。</li>
+<li>bounds は論文に倣い <strong>non-private（データ由来の min/max）</strong> を用いる（§4）。</li>
 </ol>
-<p>これにより前節の (a)(b) は根本から解消する。合成モーメントは（クリップ後ではなく）<strong>クリーンな元データの
-平均・標準偏差を基準に</strong>比較でき、OLS 参照も汚染されないため、DP–OLS の係数一致を有用性指標として
-報告できるようになった。</p>
+<p>この設定で、非プライベート OLS の RelMSE は <strong>0.441（論文 D7 と完全一致）</strong>、BinAgg は μ=1 で <strong>0.450</strong>（論文報告値 0.463 と整合）となり、論文 Table 2 を再現できた。</p>
 <blockquote>
-<p>📘 経緯: 初期版では時間の制約から「合成モーメントをクリップ後の元データ基準で比較する」という暫定策で
-(a) のみを回避し、(b) は残したまま「DP–OLS 係数一致は信頼できない」と限界に記していた。本版ではこの暫定策を
-廃し、上記の <code>-200</code> 除去（＋NMHC(GT) 除外）に置き換えて E3 全体を再計算している。</p>
-<p>⚠️ 落とし穴: 「クリップで <code>-200</code> が <span class="arithmatex">\((0,15)\)</span> の下端 0 に丸められるから大丈夫」という発想は誤り。0 も有効な観測値なので、欠損が 0 に化けることで分布が下方向に偏る。クリップは欠損処理の代わりにはならない。</p>
+<p>📘 経緯（逸脱の是正）: 初期版は手近なコードの example に倣い、独自に <code>-200</code> 除去・NMHC(GT) 除外を行い、係数誤差で評価していた。これは<strong>論文の設定からの逸脱</strong>で、悪条件性により係数が暴れて不安定な結果になった。論文の実データ評価を一次情報として読み直し、設定（<code>-200</code> を残す・RelMSE・non-private bounds）を揃えたところ報告値を再現できた。</p>
 </blockquote>
-<h3 id="31">3.1 浄化しても残る課題: 設計行列の悪条件性</h3>
+<h3 id="31-200">3.1 ロバストネス比較（逸脱・参考）: <code>-200</code> を除去すると</h3>
+<p>論文設定ではないが、<code>-200</code> を <code>NaN</code> 化して除去し、約 9 割が欠損の NMHC(GT) を列ごと除外したクリーン版（<span class="arithmatex">\(n=6941,d=11\)</span>）でも RelMSE を測った。欠損外れ値が消えて予測課題自体が易しくなるため、OLS RelMSE=0.028、BinAgg は μ=1 で 0.050（μ=5 で 0.032）と、絶対値が大きく下がる。前処理が結果スケールに与える影響の参考になる。</p>
+<blockquote>
+<p>⚠️ 補足: 欠損が支配的な NMHC(GT)（約 9 割欠損）を行除去で扱うと標本がほぼ消える（全列一括除去で 827 行）。欠損が支配的な特徴は<strong>列ごと落とす</strong>のが定石である。</p>
+</blockquote>
+<h3 id="32">3.2 残る課題: 設計行列の悪条件性</h3>
 <p><code>-200</code> を除いても、この実データの回帰設計は<strong>著しく悪条件</strong>である。特徴量の標準偏差は 0.4〜406 と桁が異なり
 （センサ応答は 0〜3000 スケール、湿度などは小さい）、センサ系列は相互に強く相関する。実際
 <span class="arithmatex">\(\mathrm{cond}(X^\top X)\approx 4.3\times10^8\)</span>、非プライベート係数も <span class="arithmatex">\(\lVert\hat\beta_{\text{OLS}}\rVert\approx 0.15\)</span> と微小である。
-このため DP–OLS の係数一致や CI 幅は一部の悪条件方向に支配されて不安定になり、シミュレーション（条件数良好）ほど
-クリーンな傾向を示さない。実データで係数レベルの有用性を見るときは、標準化・共線性の整理・次元削減や、
-係数一致に代えて予測誤差で測るといった配慮が要る。</p>
+このため<strong>係数レベル</strong>の指標（DP–OLS 係数一致・CI 幅）は一部の悪条件方向に支配されて不安定になる一方、
+<strong>予測 RelMSE は頑健</strong>である（§2 の教訓）。係数レベルの有用性を見るときは、標準化・共線性の整理・次元削減が要る。</p>
 <h2 id="4-bounds">4. bounds（定義域の上下限）の与え方とドメイン知識</h2>
-<p>DP では各特徴・目的の <strong>bounds（クリップ範囲）をデータの min/max から決めてはならない</strong>。実データの極値はそれ自体が個人の情報であり、min/max を bounds に使うとプライバシー漏えいになる。bounds は<strong>解析者がドメイン知識から外生的に与える</strong>べき量である。</p>
-<p>BinAgg example 準拠の bounds は以下の通り（単位はデータの記録系に従う）。</p>
+<p><strong>原則</strong>: 真に DP を満たすには、bounds をデータの min/max から決めてはならない（実データの極値は個人の情報であり、
+min/max を bounds に使うと漏えいになる）。bounds は解析者がドメイン知識から外生的に与えるか、予算の一部を割いて
+private に推定すべき量である。</p>
+<p><strong>ただし論文の実データ比較では、明示的に non-private な（データ由来の）bounds を用いている</strong>（「これらの bounds は
+DP ではないが、手法比較の目的では許容される」と断ったうえで）<a href="#ref1">[1]</a>。E3 はこの方針に従い、各列の
+データ min/max を bounds とした（§3）。これは<strong>手法間の比較に焦点を当てた評価上の選択</strong>であり、運用では上の原則に従う。</p>
+<blockquote>
+<p>⚠️ bounds の締まり具合が効く（本追試の確認）: 同じ E3 設定で bounds を「データ由来の min/max（締まった non-private 値）」から
+「ドメイン知識の緩い値（センサ 0–3000 等）」に替えると、BinAgg の RelMSE は <span class="arithmatex">\(\approx 0.45\)</span> から <span class="arithmatex">\(\approx 1.0\)</span> へ悪化した。
+緩い bounds は感度を過大にしノイズを増やすため。論文が non-private で締まった bounds を使うのはこのためと解釈できる。</p>
+</blockquote>
+<p>参考までに、BinAgg example が用いる<strong>ドメイン知識ベースの緩い bounds</strong>は以下の通り（単位はデータの記録系に従う）。</p>
 <table>
 <thead>
 <tr>
@@ -279,7 +287,9 @@ article{padding:12px 18px 40px}}
 </tr>
 </tbody>
 </table>
-<p><code>clip=True</code> を指定すると bounds 外の値は端点に丸められる。前節の通りこれは <code>-200</code> を 0 へ寄せる副作用を持つので、<strong>欠損除去を先に済ませてから clip を効かせる</strong>順序が重要である。</p>
+<p><code>clip=True</code> を指定すると bounds 外の値は端点に丸められる。論文準拠の E3 では bounds をデータ min/max に取るため
+クリップは実質無効（範囲外が無い）。一方クリーン版（§3.1）のように <code>-200</code> を除去する場合は、<strong>欠損除去を先に済ませてから</strong>
+bounds・clip を適用する（緩い bounds で <code>-200</code> を端点へ丸めても欠損処理にはならない）。</p>
 <blockquote>
 <p>💡 推奨: 温度 T のように下限が負になる量があるため、「特徴は非負」と決め打ちしないこと。各列の物理的にあり得る範囲を個別に設定する。湿度 RH の上限が 100（%）であることなど、単位の確認も忘れない。</p>
 </blockquote>
@@ -290,15 +300,19 @@ X \sim \mathrm{Uniform}(0, 10)^3
 \]</div>
 <p>のように生成するなら、bounds はその<strong>既知の生成範囲 <span class="arithmatex">\([0, 10]\)</span> から直接与える</strong>。実データと違い観測 min/max を覗く誘惑がそもそも存在せず、bounds は完全にデータ非依存に決まる。これが DP の前提（bounds は外生）と自然に整合するため、手法の素性を確認する用途に向く。</p>
 <h2 id="6">6. 再現者向けチェックリスト</h2>
+<p><strong>論文準拠で再現する場合（E3 本体）:</strong></p>
 <ul>
-<li>[ ] 区切りは <code>;</code>（<code>sep=';'</code>）で読み込んだか</li>
-<li>[ ] カンマ小数（<code>2,6</code> → <code>2.6</code>）を変換したか</li>
+<li>[ ] 区切りは <code>;</code>（<code>sep=';'</code>）、カンマ小数（<code>2,6</code> → <code>2.6</code>）を変換したか</li>
+<li>[ ] <code>to_numeric</code> + <code>dropna</code> のみ（<strong><code>-200</code> は残す・全 12 特徴を使う</strong>）で <span class="arithmatex">\(n=9357,d=12\)</span> になったか</li>
+<li>[ ] 指標は<strong>予測誤差 RelMSE</strong>（係数誤差・モーメント誤差ではない）か</li>
+<li>[ ] bounds は論文に倣い <strong>non-private なデータ min/max</strong> にしたか（緩いドメイン bounds だと RelMSE が悪化）</li>
+<li>[ ] μ=1 の値を論文 Table 2（D7: OLS 0.441 / BinAgg 0.463）と並べて照合したか</li>
+</ul>
+<p><strong><code>-200</code> を除去するクリーン版を作る場合（ロバストネス・逸脱）:</strong></p>
+<ul>
 <li>[ ] 欠損が支配的な列（NMHC(GT) 約 9 割欠損）を<strong>列ごと除外</strong>したか</li>
-<li>[ ] 欠損センチネル <code>-200</code> を <code>NaN</code> 化し、使用列の欠損行を除去したか</li>
-<li>[ ] 除去を<strong>統計・回帰・参照計算より前</strong>に済ませたか</li>
-<li>[ ] bounds をデータの min/max ではなくドメイン知識から与えたか</li>
-<li>[ ] <code>clip=True</code> の丸め挙動を確認し、欠損除去後に clip を適用したか</li>
-<li>[ ] 合成モーメント比較の参照が（生ではなく）クリーニング後データになっているか</li>
+<li>[ ] <code>-200</code> を <code>NaN</code> 化し、使用列の欠損行を<strong>統計・回帰より前に</strong>除去したか</li>
+<li>[ ] 論文設定ではない旨を明記し、論文準拠版と区別して報告したか</li>
 </ul>
 <h2 id="_2">参照</h2>
 <ol class="refs">
