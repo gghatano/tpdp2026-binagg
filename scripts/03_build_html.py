@@ -69,10 +69,22 @@ hr{border:none;border-top:1px solid var(--line);margin:2em 0}
 @media(max-width:880px){nav.toc{display:none}.layout{padding:0 16px}}
 """
 
+MATHJAX = """
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\\\(", "\\\\)"]], displayMath: [["\\\\[", "\\\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+"""
+
 TEMPLATE = """<!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
+{mathjax}
 <style>{css}</style></head>
 <body><div class="layout">
 <nav class="toc"><div class="brand">{title}</div><div class="sub">{subtitle}</div>
@@ -117,13 +129,15 @@ def main() -> None:
         src = CONTENT / p["md"]
         text = src.read_text(encoding="utf-8")
         md = markdown.Markdown(
-            extensions=["tables", "fenced_code", "toc", "sane_lists"],
-            extension_configs={"toc": {"toc_depth": "2-3"}},
+            extensions=["tables", "fenced_code", "toc", "sane_lists",
+                        "pymdownx.arithmatex"],
+            extension_configs={"toc": {"toc_depth": "2-3"},
+                               "pymdownx.arithmatex": {"generic": True}},
         )
         body = md.convert(text)
         body = embed_images(body)
         html = TEMPLATE.format(
-            title=p["title"], subtitle=p["subtitle"], css=CSS,
+            title=p["title"], subtitle=p["subtitle"], css=CSS, mathjax=MATHJAX,
             nav=build_nav(p["html"]), toc=md.toc, body=body, md=p["md"],
         )
         out = HTMLS / p["html"]

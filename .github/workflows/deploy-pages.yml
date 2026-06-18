@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install builder deps
-        run: pip install "markdown==3.10.2"
+        run: pip install "markdown==3.10.2" "pymdown-extensions==10.21.3"
       - name: Build HTML
         run: python scripts/03_build_html.py
       - uses: actions/configure-pages@v5
