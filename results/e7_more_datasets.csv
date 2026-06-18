@@ -1,0 +1,6 @@
+dataset,paper_id,status,n,d,paper_n,paper_d,n_match,d_match,ols_relmse,binagg_relmse_mean,binagg_relmse_std
+BUPA,D2,ok,345,6,345,6,True,True,0.4064,0.7703,0.3196
+Parkinsons,D5,ok,5875,21,5875,21,True,True,0.0108,0.0147,0.0016
+Superconductivity,D9,ok,21263,81,21263,81,True,True,0.1308,0.2008,0.0096
+D1,D1,identified_data_unavailable,,,182,4,,,,,
+D3,D3,unidentified,,,2043,8,,,,,

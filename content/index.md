@@ -231,8 +231,10 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
    本追試は未実施（→ [#1](https://github.com/gghatano/tpdp2026-binagg/issues/1)）。
 2. **比較手法**: **AdaSSP** は best-effort で追加し優劣 BinAgg < AdaSSP を再現（[発展実験](extensions.html)）。
    **DP-GD** はチューニング感度・コストのため未実施（→ [#2](https://github.com/gghatano/tpdp2026-binagg/issues/2)）。
-3. **データセットの広がり**: 同定できた **Abalone・Appliances** は論文値をほぼ再現、**Wine** は前処理差で乖離。
-   同定困難な D1/D2/D3/D5/D9 は未実施（→ [#3](https://github.com/gghatano/tpdp2026-binagg/issues/3)）。反復は論文と同じ **100** に揃えた。
+3. **データセットの広がり**: 同定できた **Abalone・Appliances** は論文値をほぼ再現、**Wine** の乖離は
+   red/white の列アラインメント由来と判明し**解消**（OLS 0.016 / BinAgg 0.021、[発展実験](extensions.html)）。
+   さらに **D1=LT-FS-ID(WSN)・D2=BUPA Liver・D5=Parkinsons Telemonitoring・D9=Superconductivity** を同定し、
+   D2/D5/D9 を best-effort 追試（**D3 のみ未同定**）（→ [#3](https://github.com/gghatano/tpdp2026-binagg/issues/3)）。反復は論文と同じ **100** に揃えた。
 4. **漸近信頼区間の有限標本近似**: 被覆率が 0.95 を僅かに下回る点の、$n$・bin 数を増やした感度分析は未実施
    （→ [#4](https://github.com/gghatano/tpdp2026-binagg/issues/4)）。
 5. **bounds の与え方**: 実データでは論文に倣い non-private な bounds を用いた（DP ではない）。bounds を

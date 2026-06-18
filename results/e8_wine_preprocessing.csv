@@ -1,0 +1,5 @@
+variant,with_type,intercept,d,ols_relmse,comment
+"E5 baseline: 11 chem + type, no intercept",True,False,12,0.0156,matches paper d=12 (this is the current E5 encoding)
+11 chem + type + intercept,True,True,13,0.0155,d=13
+"11 chem + intercept, NO type",False,True,12,0.0156,alt d=12 (intercept replaces the type indicator)
+"11 chem only, no intercept",False,False,11,0.0156,d=11 (drop type)

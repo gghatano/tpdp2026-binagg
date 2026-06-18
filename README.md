@@ -36,7 +36,12 @@ uv pip install --python .venv -r requirements.txt \
 .venv/Scripts/python.exe scripts/04_preprocessing_variants.py # 補足: 欠損処理・標準化・係数指標
 .venv/Scripts/python.exe scripts/05_other_datasets.py    # 発展: 他データ(Abalone/Wine/Appliances)
 .venv/Scripts/python.exe scripts/06_adassp.py            # 発展: AdaSSP 比較 (D7)
+.venv/Scripts/python.exe scripts/07_more_datasets.py     # 発展: 追加同定データ (D2/D5/D9, best-effort)
+.venv/Scripts/python.exe scripts/08_wine_preprocessing.py # 発展: Wine 前処理の乖離切り分け
 ```
+
+> 注: `05`（OpenML 経由）と異なり、`07`/`08` は OpenML/UCI が遮断された環境向けに、
+> 各データを **GitHub ミラー**から取得し `data/cache/`（gitignore 済み）にキャッシュする。
 
 結果は `results/*.json|*.csv` と `results/figures/*.png` に出力される（シード固定で再現可能）。
 
