@@ -11,8 +11,8 @@ Reproduces the paper's real-data protocol for D7 = Air Quality (Table 2, [1]):
 Smoke-validated: this setup reproduces OLS RelMSE = 0.441 and BinAgg ~ 0.45 at mu=1.
 
 DEVIATIONS from the paper (logged; see docs/plans/E3-paper-faithful.md):
-  - only BinAgg + OLS (AdaSSP / DP-GD are outside the BinAgg package)
-  - 30 repetitions (paper: 100)
+  - only BinAgg + OLS in the main table (AdaSSP is added separately in 06_adassp.py;
+    DP-GD is outside scope -- the paper notes it is highly tuning-sensitive)
   - additionally sweep mu and report a cleaned-data variant (-200 removed,
     NMHC(GT) dropped; n=6941, d=11) as a robustness comparison (NOT the paper setting).
 
@@ -29,7 +29,7 @@ from binagg import dp_linear_regression, generate_synthetic_data
 from common import DATA, FIGURES, MU_GRID, RESULTS, ols, save_json
 
 TARGET = "CO(GT)"
-N_REPS = 30
+N_REPS = 100  # matches the paper's 100 repetitions
 SEEDS = list(range(N_REPS))
 
 # Paper-reported RelMSE for D7 (Air Quality), Table 2 of [1].

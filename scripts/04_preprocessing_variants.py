@@ -73,8 +73,18 @@ def relmse(X, y, beta):
     return float(np.sum((X @ beta - y) ** 2) / np.sum(y ** 2))
 
 
+def variant_keep_std():
+    """Paper data with per-feature standardization (z-score), to reduce conditioning."""
+    X, y, fc = variant_keep()
+    mu_ = X.mean(axis=0)
+    sd = X.std(axis=0)
+    sd[sd == 0] = 1.0
+    return (X - mu_) / sd, y, fc
+
+
 VARIANTS = [
     ("keep (paper)", variant_keep),
+    ("keep + standardized", variant_keep_std),
     ("drop_rows", variant_drop_rows),
     ("impute", variant_impute),
 ]
@@ -87,6 +97,7 @@ def main() -> None:
         xb, yb = nonprivate_bounds(X, y)
         beta_ols = ols(X, y)
         ols_rel = relmse(X, y, beta_ols)
+        cond = float(np.linalg.cond(X.T @ X))
         rows = []
         for mu in MU_GRID:
             rm, cl = [], []
@@ -100,8 +111,8 @@ def main() -> None:
                          "binagg_relmse_mean": float(rm.mean()), "binagg_relmse_std": float(rm.std()),
                          "coef_relL2_mean": float(cl.mean()), "coef_relL2_std": float(cl.std())})
         results[name] = {"n": int(X.shape[0]), "d": int(X.shape[1]),
-                         "ols_relmse": ols_rel, "rows": rows}
-        print(f"[{name:14s}] n={X.shape[0]:5d} d={X.shape[1]:2d} OLS RelMSE={ols_rel:.3f}")
+                         "ols_relmse": ols_rel, "cond_xtx": cond, "rows": rows}
+        print(f"[{name:20s}] n={X.shape[0]:5d} d={X.shape[1]:2d} cond={cond:.2e} OLS RelMSE={ols_rel:.3f}")
         for r in rows:
             print(f"    mu={r['mu']:>4}: BinAgg RelMSE={r['binagg_relmse_mean']:.3f}  "
                   f"coef relL2={r['coef_relL2_mean']:.2f}±{r['coef_relL2_std']:.2f}")
@@ -114,10 +125,10 @@ def main() -> None:
     })
     with open(RESULTS / "e4_preprocessing.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["variant", "n", "d", "mu", "ols_relmse", "binagg_relmse", "coef_relL2"])
+        w.writerow(["variant", "n", "d", "cond_xtx", "mu", "ols_relmse", "binagg_relmse", "coef_relL2"])
         for name, v in results.items():
             for r in v["rows"]:
-                w.writerow([name, v["n"], v["d"], r["mu"], v["ols_relmse"],
+                w.writerow([name, v["n"], v["d"], v["cond_xtx"], r["mu"], v["ols_relmse"],
                             r["binagg_relmse_mean"], r["coef_relL2_mean"]])
 
     import matplotlib

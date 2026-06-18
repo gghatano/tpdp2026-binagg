@@ -1,0 +1,28 @@
+{
+  "mu": 1.0,
+  "n_reps": 100,
+  "n": 9357,
+  "d": 12,
+  "summary": {
+    "OLS": {
+      "relmse": 0.44125860308425474,
+      "paper": 0.441
+    },
+    "BinAgg": {
+      "relmse_mean": 0.4497582960668883,
+      "relmse_std": 0.005655469501419807,
+      "paper": 0.463
+    },
+    "AdaSSP": {
+      "relmse_mean": 0.5950550949719033,
+      "relmse_std": 0.00960184536526979,
+      "paper": 0.682,
+      "note": "best-effort; calibration may differ"
+    },
+    "DP-GD": {
+      "relmse_mean": null,
+      "paper": 0.852,
+      "note": "out of scope"
+    }
+  }
+}

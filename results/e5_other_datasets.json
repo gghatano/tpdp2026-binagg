@@ -1,0 +1,124 @@
+{
+  "experiment": "E5 best-effort: 3 more UCI datasets (Table 2 of [1])",
+  "metric": "RelMSE = ||X*beta - y||^2 / ||y||^2 (prediction error, no intercept)",
+  "bounds": "non-private per-column data min/max; y_bounds = y min/max",
+  "binagg": {
+    "mu": 1.0,
+    "n_reps": 30,
+    "seeds": "0..29"
+  },
+  "datasets": {
+    "Abalone": {
+      "status": "ok",
+      "source": "openml {'name': 'abalone'}",
+      "preprocessing_note": "Sex one-hot (3 cols: M/F/I) + 7 numeric = 10; target=Rings; no missing values; one-hot NOT dropped-first (full 3-col encoding -> d=10).",
+      "n": 4177,
+      "d": 10,
+      "n_match": true,
+      "d_match": true,
+      "paper": {
+        "n": 4177,
+        "d": 10,
+        "OLS": 0.044,
+        "BinAgg": 0.059
+      },
+      "ols_relmse": 0.04403251499301592,
+      "binagg_relmse_mean": 0.05671551904856286,
+      "binagg_relmse_std": 0.008563688490694702,
+      "binagg_n_ok": 30,
+      "features": [
+        "Sex_F",
+        "Sex_I",
+        "Sex_M",
+        "Length",
+        "Diameter",
+        "Height",
+        "Whole_weight",
+        "Shucked_weight",
+        "Viscera_weight",
+        "Shell_weight"
+      ]
+    },
+    "WineQuality": {
+      "status": "ok",
+      "source": "openml {'name': 'wine-quality-red'} + openml {'name': 'wine-quality-white'}",
+      "preprocessing_note": "red (1599) + white (4898) stacked (6497); 11 chem features + type {red=0,white=1} = 12; target=quality (cast to float).",
+      "n": 6497,
+      "d": 12,
+      "n_match": true,
+      "d_match": true,
+      "paper": {
+        "n": 6497,
+        "d": 12,
+        "OLS": 0.016,
+        "BinAgg": 0.022
+      },
+      "ols_relmse": 0.027172394237471507,
+      "binagg_relmse_mean": 0.03683705827657348,
+      "binagg_relmse_std": 0.00466811662435078,
+      "binagg_n_ok": 30,
+      "features": [
+        "fixed_acidity",
+        "volatile_acidity",
+        "citric_acid",
+        "residual_sugar",
+        "chlorides",
+        "free_sulfur_dioxide",
+        "total_sulfur_dioxide",
+        "density",
+        "pH",
+        "sulphates",
+        "alcohol",
+        "type_white"
+      ]
+    },
+    "Appliances": {
+      "status": "ok",
+      "source": "openml {'name': 'Appliances_Energy_Prediction'}",
+      "preprocessing_note": "openml frame has no date col; target=Appliances; all 27 remaining features kept (includes lights, rv1, rv2) -> d=27.",
+      "n": 19735,
+      "d": 27,
+      "n_match": true,
+      "d_match": true,
+      "paper": {
+        "n": 19735,
+        "d": 27,
+        "OLS": 0.438,
+        "BinAgg": 0.507
+      },
+      "ols_relmse": 0.4376759170368919,
+      "binagg_relmse_mean": 0.4972679062011171,
+      "binagg_relmse_std": 0.008790059538131377,
+      "binagg_n_ok": 30,
+      "features": [
+        "lights",
+        "T1",
+        "RH_1",
+        "T2",
+        "RH_2",
+        "T3",
+        "RH_3",
+        "T4",
+        "RH_4",
+        "T5",
+        "RH_5",
+        "T6",
+        "RH_6",
+        "T7",
+        "RH_7",
+        "T8",
+        "RH_8",
+        "T9",
+        "RH_9",
+        "T_out",
+        "Press_mm_hg",
+        "RH_out",
+        "Windspeed",
+        "Visibility",
+        "Tdewpoint",
+        "rv1",
+        "rv2"
+      ]
+    }
+  }
+}

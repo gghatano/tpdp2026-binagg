@@ -1,0 +1,4 @@
+dataset,status,n,d,paper_n,paper_d,n_match,d_match,ols_relmse,binagg_relmse_mean,binagg_relmse_std,paper_ols,paper_binagg
+Abalone,ok,4177,10,4177,10,True,True,0.0440,0.0567,0.0086,0.044,0.059
+WineQuality,ok,6497,12,6497,12,True,True,0.0272,0.0368,0.0047,0.016,0.022
+Appliances,ok,19735,27,19735,27,True,True,0.4377,0.4973,0.0088,0.438,0.507

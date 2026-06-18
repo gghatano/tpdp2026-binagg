@@ -17,7 +17,8 @@ Statistical Guarantees* (Lin, Slavković & Bhoomireddy, AISTATS 2026,
 | 📐 用語と記法 | [content/notation.md](content/notation.md) | 用語・記号の定義 |
 | 🧩 手法詳細 | [content/method-binagg.md](content/method-binagg.md) | BinAgg のアルゴリズムと直感 |
 | 🔬 前処理・データ | [content/data-notes.md](content/data-notes.md) | 前処理の工夫・ドメイン知識・`-200` 知見 |
-| 🧪 補足実験 | [content/supplementary.md](content/supplementary.md) | 欠損処理の選択（行削除・補完）と係数指標での比較 |
+| 🧪 補足実験 | [content/supplementary.md](content/supplementary.md) | 欠損処理・標準化と係数指標での比較 |
+| 📈 発展実験 | [content/extensions.md](content/extensions.md) | 比較手法 AdaSSP・他データ(Abalone/Wine/Appliances)・反復数 |
 | 🛠 エンジニアリング | [content/engineering-notes.md](content/engineering-notes.md) | 環境構築・再現手順・落とし穴 |
 | ❓ QA・メモ | [content/faq.md](content/faq.md) | よくある疑問と設計判断 |
 
@@ -31,7 +32,10 @@ uv pip install --python .venv -r requirements.txt \
   "git+https://github.com/Shuronglin/BinAgg.git@13c09bb"
 .venv/Scripts/python.exe scripts/01_sim_coverage.py      # E1: CI 被覆率（統計的保証）
 .venv/Scripts/python.exe scripts/02_synthetic_utility.py # E2: 合成データの回帰 utility
-.venv/Scripts/python.exe scripts/03_real_airquality.py   # E3: 実データ (Air Quality)
+.venv/Scripts/python.exe scripts/03_real_airquality.py   # E3: 実データ (論文準拠 D7, RelMSE)
+.venv/Scripts/python.exe scripts/04_preprocessing_variants.py # 補足: 欠損処理・標準化・係数指標
+.venv/Scripts/python.exe scripts/05_other_datasets.py    # 発展: 他データ(Abalone/Wine/Appliances)
+.venv/Scripts/python.exe scripts/06_adassp.py            # 発展: AdaSSP 比較 (D7)
 ```
 
 結果は `results/*.json|*.csv` と `results/figures/*.png` に出力される（シード固定で再現可能）。

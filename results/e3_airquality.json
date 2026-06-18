@@ -1,7 +1,7 @@
 {
   "metric": "RelMSE = ||X*beta - y||^2 / ||y||^2 (prediction error)",
   "bounds": "non-private per-column data min/max",
-  "n_reps": 30,
+  "n_reps": 100,
   "paper_reported_D7": {
     "OLS": 0.441,
     "BinAgg": 0.463,
@@ -29,27 +29,27 @@
     "rows": [
       {
         "mu": 0.5,
-        "binagg_relmse_mean": 0.507511320707315,
-        "binagg_relmse_std": 0.023869091015792154,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.5091581929570381,
+        "binagg_relmse_std": 0.03154276493209564,
+        "n_ok": 100
       },
       {
         "mu": 1.0,
-        "binagg_relmse_mean": 0.4495054526068737,
-        "binagg_relmse_std": 0.005486312319392902,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.4497582960668883,
+        "binagg_relmse_std": 0.005655469501419807,
+        "n_ok": 100
       },
       {
         "mu": 2.0,
-        "binagg_relmse_mean": 0.4433593341516392,
-        "binagg_relmse_std": 0.0006510565989708733,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.4431795142764774,
+        "binagg_relmse_std": 0.0006890652731203452,
+        "n_ok": 100
       },
       {
         "mu": 5.0,
-        "binagg_relmse_mean": 0.4437734422155934,
-        "binagg_relmse_std": 0.0005149054548694163,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.44392346866295085,
+        "binagg_relmse_std": 0.0005944269266101865,
+        "n_ok": 100
       }
     ]
   },
@@ -73,27 +73,27 @@
     "rows": [
       {
         "mu": 0.5,
-        "binagg_relmse_mean": 0.07771617453253439,
-        "binagg_relmse_std": 0.03859574335474527,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.0765757063667263,
+        "binagg_relmse_std": 0.032705451493241965,
+        "n_ok": 100
       },
       {
         "mu": 1.0,
-        "binagg_relmse_mean": 0.049541559404029746,
-        "binagg_relmse_std": 0.011331991003711007,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.048151666723390295,
+        "binagg_relmse_std": 0.009124405634446631,
+        "n_ok": 100
       },
       {
         "mu": 2.0,
-        "binagg_relmse_mean": 0.03597026544680168,
-        "binagg_relmse_std": 0.002978080221724354,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.035971914741311936,
+        "binagg_relmse_std": 0.002782247507898109,
+        "n_ok": 100
       },
       {
         "mu": 5.0,
-        "binagg_relmse_mean": 0.03154543997595505,
-        "binagg_relmse_std": 0.000852084341350929,
-        "n_ok": 30
+        "binagg_relmse_mean": 0.031960075703595936,
+        "binagg_relmse_std": 0.0011408602205218881,
+        "n_ok": 100
       }
     ],
     "note": "deviation: -200 removed, NMHC(GT) dropped (NOT the paper setting)"
