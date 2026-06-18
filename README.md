@@ -38,6 +38,7 @@ uv pip install --python .venv -r requirements.txt \
 .venv/Scripts/python.exe scripts/06_adassp.py            # 発展: AdaSSP 比較 (D7)
 .venv/Scripts/python.exe scripts/07_more_datasets.py     # 発展: 追加同定データ (D2/D5/D9, best-effort)
 .venv/Scripts/python.exe scripts/08_wine_preprocessing.py # 発展: Wine 前処理の乖離切り分け
+.venv/Scripts/python.exe scripts/09_coefficients.py      # 発展: 係数レベル比較 (OLS vs BinAgg, 生/標準化)
 ```
 
 > 注: `05`（OpenML 経由）と異なり、`07`/`08` は OpenML/UCI が遮断された環境向けに、
