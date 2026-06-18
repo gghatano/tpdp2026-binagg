@@ -1,0 +1,10 @@
+# Pinned environment for BinAgg reproduction (Issue #16)
+# Python 3.12.12 (via `uv venv --python 3.12`)
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.0.3
+scikit-learn==1.9.0
+matplotlib==3.11.0
+# BinAgg itself (install separately, pinned to the reproduced commit):
+#   uv pip install "git+https://github.com/Shuronglin/BinAgg.git@13c09bb3e32f9a2c2915df3599d99b79a057b05d"
+# Reproduced against BinAgg commit 13c09bb (2026-05-27).

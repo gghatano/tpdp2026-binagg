@@ -1,0 +1,69 @@
+{
+  "n": 2000,
+  "trials": 300,
+  "alpha": 0.05,
+  "true_beta": [
+    1.5,
+    -2.0,
+    0.5
+  ],
+  "target_coverage": 0.95,
+  "rows": [
+    {
+      "mu": 0.5,
+      "n_valid_trials": 300,
+      "coverage_dp_mean": 0.9166666666666666,
+      "coverage_dp_per_coef": [
+        0.93,
+        0.8933,
+        0.9267
+      ],
+      "coverage_naive_mean": 0.07666666666666666,
+      "abs_bias_dp_mean": 0.0638151520225122,
+      "abs_bias_naive_mean": 0.06550534786562347,
+      "ci_width_dp_mean": 0.5184444864201448
+    },
+    {
+      "mu": 1.0,
+      "n_valid_trials": 300,
+      "coverage_dp_mean": 0.931111111111111,
+      "coverage_dp_per_coef": [
+        0.94,
+        0.8967,
+        0.9567
+      ],
+      "coverage_naive_mean": 0.14888888888888888,
+      "abs_bias_dp_mean": 0.031632503806210896,
+      "abs_bias_naive_mean": 0.03223104739567685,
+      "ci_width_dp_mean": 0.29055135287747125
+    },
+    {
+      "mu": 2.0,
+      "n_valid_trials": 300,
+      "coverage_dp_mean": 0.9344444444444445,
+      "coverage_dp_per_coef": [
+        0.9433,
+        0.89,
+        0.97
+      ],
+      "coverage_naive_mean": 0.22666666666666668,
+      "abs_bias_dp_mean": 0.01902479778174804,
+      "abs_bias_naive_mean": 0.019244996850644455,
+      "ci_width_dp_mean": 0.1813307949674554
+    },
+    {
+      "mu": 5.0,
+      "n_valid_trials": 300,
+      "coverage_dp_mean": 0.9177777777777778,
+      "coverage_dp_per_coef": [
+        0.91,
+        0.8967,
+        0.9467
+      ],
+      "coverage_naive_mean": 0.31777777777777777,
+      "abs_bias_dp_mean": 0.011891290138959934,
+      "abs_bias_naive_mean": 0.011951457639200377,
+      "ci_width_dp_mean": 0.10301896398127142
+    }
+  ]
+}
