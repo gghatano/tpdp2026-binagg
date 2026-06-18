@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手法詳細 — BinAgg 再現追試</title>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<style>
+:root{--fg:#1a1a1a;--muted:#666;--accent:#c0392b;--link:#1565c0;--line:#e3e3e3;
+--bg:#f3f4f6;--card:#fff;--code:#f6f8fa;--sidebar:#fbfbfc;--chip:#eef4fb;--chipline:#cfe0f3}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;line-height:1.85}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+/* hero + tabs */
+.hero{background:linear-gradient(135deg,#2c3e50 0%,#c0392b 130%);color:#fff}
+.hero .inner{max-width:1180px;margin:0 auto;padding:26px 20px 0}
+.hero h1{margin:0 0 4px;font-size:1.6rem}
+.hero p{margin:0 0 16px;opacity:.92;font-size:.95rem}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs a{color:#fff;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:8px 8px 0 0;
+font-size:.9rem;white-space:nowrap}
+nav.tabs a:hover{background:rgba(255,255,255,.26);text-decoration:none}
+nav.tabs a.active{background:var(--bg);color:var(--accent);font-weight:600}
+/* layout */
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px 40px;display:grid;
+grid-template-columns:250px 1fr;gap:32px}
+nav.toc{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;
+background:var(--sidebar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+nav.toc .toc-title{font-weight:700;margin-bottom:6px}
+nav.toc ul{list-style:none;margin:0;padding-left:0}
+nav.toc li{margin:2px 0}
+nav.toc a{color:var(--muted);display:block;padding:2px 6px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+nav.toc a:hover{color:var(--accent);background:#fff;text-decoration:none}
+nav.toc ul ul a{padding-left:18px;font-size:12.5px}
+/* article card */
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;
+box-shadow:0 1px 10px rgba(0,0,0,.04);padding:12px 40px 56px;min-width:0}
+article>h1:first-of-type{display:none}
+article :is(h2,h3,h4){scroll-margin-top:16px}
+article h2{font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:1.9em}
+article h3{font-size:1.16rem;margin-top:1.6em}
+article h4{font-size:1rem;color:var(--accent)}
+code{background:var(--code);padding:.12em .4em;border-radius:6px;font-size:88%;
+font-family:"Cascadia Code",Consolas,"SF Mono",monospace}
+pre{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 13px}
+th{background:#f2f4f7}
+tr:nth-child(2n){background:#fbfbfc}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin:1.2em auto;display:block}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:4px solid var(--accent);
+background:#fdf3f2;border-radius:0 8px 8px 0;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.2em 0}
+/* citation chips */
+a[href^="#ref"]{font-size:.72em;vertical-align:super;line-height:0;background:var(--chip);
+border:1px solid var(--chipline);border-radius:4px;padding:0 4px;color:var(--link);text-decoration:none}
+a[href^="#ref"]:hover{background:#dceaf8}
+ol.refs{font-size:.92rem;color:#333;padding-left:1.4em}
+ol.refs li{margin:.4em 0}
+ol.refs li:target{background:#fff6d6;border-radius:4px}
+.footer{max-width:1180px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:860px){.layout{grid-template-columns:1fr}nav.toc{position:static;max-height:none}
+article{padding:12px 18px 40px}}
+</style></head>
+<body>
+<header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>BinAgg のアルゴリズムと直感</p></div>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html" class="active">🧩 手法詳細</a><a href="data-notes.html">🔬 前処理・データ</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<div class="layout">
+<nav class="toc"><div class="toc-title">目次</div><div class="toc">
+<ul>
+<li><a href="#1-dp">1. 問題設定: なぜ素朴な DP 回帰は失敗するか</a></li>
+<li><a href="#2">2. 全体の流れ</a><ul>
+<li><a href="#21-privtree-private">2.1 PrivTree による private 分割</a></li>
+<li><a href="#22-bin">2.2 bin 単位の集約にノイズ付与</a></li>
+<li><a href="#23-bin">2.3 後処理（小 bin 除去とサンプルサイズ保存）</a></li>
+</ul>
+</li>
+<li><a href="#3-algorithm-2-dp">3. Algorithm 2: DP 線形回帰</a><ul>
+<li><a href="#31">3.1 バイアス補正付き重み付き最小二乗</a></li>
+<li><a href="#32">3.2 サンドイッチ分散推定</a></li>
+</ul>
+</li>
+<li><a href="#4-algorithm-3">4. Algorithm 3: 合成データ生成</a></li>
+<li><a href="#5-3-options">5. 実装の 3 つの使い方（Options）</a></li>
+<li><a href="#6">6. 主なパラメータ</a></li>
+<li><a href="#7-mu">7. 直感の補足: \(\mu\) を動かすと何が起きるか</a></li>
+<li><a href="#_1">参照</a></li>
+</ul>
+</div>
+</nav>
+<article><h1 id="binagg">BinAgg 手法詳細</h1>
+<blockquote>
+<p>📘 出典: 本ページの記述は原論文 <a href="#ref1">[1]</a> と実装 <a href="#ref2">[2]</a> に基づく。実測値はレポート本体を参照。</p>
+</blockquote>
+<p>BinAgg（Binning-Aggregation）は、<span class="arithmatex">\(\mu\)</span>-GDP（Gaussian Differential Privacy）の下で差分プライバシー（DP）線形回帰と合成データ生成を同一の集約量から行う手法である <a href="#ref1">[1]</a>。本ページでは、なぜ素朴な DP 回帰が失敗するか、BinAgg がどの設計でそれを補正するか、そして実装上の使い方とパラメータを解説する。</p>
+<h2 id="1-dp">1. 問題設定: なぜ素朴な DP 回帰は失敗するか</h2>
+<p>DP を満たす最も単純な回帰は、回帰に必要な集約量（<span class="arithmatex">\(X^\top X\)</span> や <span class="arithmatex">\(X^\top y\)</span> に相当する二乗和・積和）を計算し、そこへノイズを足して公開し、あとは通常の最小二乗を適用する、というものである。これは 2 つの歪みを生む。</p>
+<p><strong>(1) 点推定のバイアス（0 方向への縮小）.</strong> 重み付き最小二乗の核となる行列 <span class="arithmatex">\(S^\top W S\)</span> にノイズ入りの値を使うと、ノイズ入り二乗和 <span class="arithmatex">\(\tilde S^\top \tilde W \tilde S\)</span> は真の <span class="arithmatex">\(S^\top W S\)</span> よりも系統的に大きくなる。これはノイズの 2 乗の期待値が正であるため、対角成分（説明変数の分散に相当）に正のバイアスが乗るからである。回帰係数はおおむね <span class="arithmatex">\((S^\top W S)^{-1}\)</span> の形で逆行列を通るので、分母が膨らむと推定値は 0 の方向へ縮小（attenuation）する。</p>
+<blockquote>
+<p>💡 直感: 「測定誤差のある説明変数で回帰すると傾きが 0 に引っ張られる」という古典的な測定誤差バイアスと同じ現象である。DP ノイズはまさにその測定誤差として振る舞う。</p>
+</blockquote>
+<p><strong>(2) 分散の過小評価（CI が狭すぎる）.</strong> 標準的な標準誤差の式は、データのばらつきだけを誤差源と見なす。しかし DP 公開値には注入ノイズという第二の誤差源があり、これを無視すると推定の不確実性を過小に見積もる。結果として信頼区間（CI）が狭くなりすぎ、名目被覆率（例: 95%）を実際には下回る。</p>
+<blockquote>
+<p>⚠️ 注意: この 2 つは別々の問題である。点推定のバイアスを補正しても、分散を正しく見積もらなければ CI の被覆は回復しない。BinAgg は両方に対処する（§3）。</p>
+</blockquote>
+<h2 id="2">2. 全体の流れ</h2>
+<p>BinAgg は「private に区間分割（binning）してから、bin 単位の集約量にノイズを足す」という二段構えを取る。</p>
+<h3 id="21-privtree-private">2.1 PrivTree による private 分割</h3>
+<p>まずデータ空間を bin に分割するが、分割境界そのものがデータに依存すると漏えいになる。そこで PrivTree を用いて private に空間を再帰分割する <a href="#ref1">[1]</a>。密度の高い領域は細かく、疎な領域は粗く分割される。</p>
+<h3 id="22-bin">2.2 bin 単位の集約にノイズ付与</h3>
+<p>各 bin について <span class="arithmatex">\(\mathrm{count}\)</span>、<span class="arithmatex">\(\mathrm{sum}(X)\)</span>、<span class="arithmatex">\(\mathrm{sum}(y)\)</span> を集計し、それぞれに Gaussian ノイズを加える。総プライバシー予算 <span class="arithmatex">\(\mu\)</span> を以下の 4 要素に配分する（既定値）<a href="#ref2">[2]</a>。</p>
+<ul>
+<li>binning（分割）: <span class="arithmatex">\(1\)</span></li>
+<li>count: <span class="arithmatex">\(3\)</span></li>
+<li><span class="arithmatex">\(\mathrm{sum}_x\)</span>: <span class="arithmatex">\(3\)</span></li>
+<li><span class="arithmatex">\(\mathrm{sum}_y\)</span>: <span class="arithmatex">\(3\)</span></li>
+</ul>
+<p>すなわち比 <span class="arithmatex">\((\text{binning}, \text{count}, \text{sum}_x, \text{sum}_y) = (1,3,3,3)\)</span> で、分割に約 10%、各集約に約 30% ずつを割り当てる。</p>
+<blockquote>
+<p>💡 直感: 分割の精度よりも集約量の精度のほうが推定誤差に効くため、予算の大半（90%）を集約に回す。</p>
+</blockquote>
+<h3 id="23-bin">2.3 後処理（小 bin 除去とサンプルサイズ保存）</h3>
+<p>合成標本が <code>min_count=2</code> 未満になる bin は信頼できないため捨てる。さらに <code>preserve_sample_size</code> により、生成後の合計件数を元の <span class="arithmatex">\(n\)</span> に合わせるよう調整する。これにより下流の解析がサンプルサイズの不一致で歪むのを防ぐ。</p>
+<h2 id="3-algorithm-2-dp">3. Algorithm 2: DP 線形回帰</h2>
+<p>BinAgg の回帰は、§1 の 2 つの歪みをそれぞれバイアス補正項とサンドイッチ分散で打ち消す。</p>
+<h3 id="31">3.1 バイアス補正付き重み付き最小二乗</h3>
+<p>核となるのは、補正項 <span class="arithmatex">\(\tilde D\)</span> を差し引いた重み付き最小二乗である <a href="#ref1">[1]</a>。</p>
+<div class="arithmatex">\[
+\tilde\beta = (\tilde S^\top \tilde W \tilde S - \tilde D)^{-1}\, \tilde S^\top \tilde W \tilde t
+\]</div>
+<p>ここで <span class="arithmatex">\(\tilde D\)</span> は、ノイズが二乗和に持ち込む系統的な増分（§1 の (1) で述べた正のバイアス）を打ち消す項である。ノイズ分散は既知（解析者が選んだ <span class="arithmatex">\(\mu\)</span> と予算配分から決まる）なので、その期待増分を解析的に計算して差し引ける。重み行列 <span class="arithmatex">\(W\)</span> は各 bin の件数の逆数を対角に持ち、件数の多い bin の集約値ほど相対的に信頼して重みづけする。</p>
+<h3 id="32">3.2 サンドイッチ分散推定</h3>
+<p>分散はサンドイッチ推定量で与える <a href="#ref1">[1]</a>。</p>
+<div class="arithmatex">\[
+\tilde\Sigma = \tilde M^{-1}\, \tilde H\, \tilde M^{-1}, \quad \tilde M = \tfrac{1}{K}\tilde S^\top \tilde W \tilde S - \tilde D
+\]</div>
+<p>ここで <span class="arithmatex">\(K\)</span> は bin の数、<span class="arithmatex">\(\tilde M\)</span> は §3.1 と同じバイアス補正を施した「パンの部分」、<span class="arithmatex">\(\tilde H\)</span> は中央の「具の部分」でノイズ起因の分散を含む。この構成により、DP ノイズという第二の誤差源を分散に取り込み、漸近的に妥当な信頼区間を構成できる（Theorem 4.2）<a href="#ref1">[1]</a>。</p>
+<blockquote>
+<p>💡 直感: サンドイッチ推定は誤差構造の仮定が崩れても妥当な分散を与えるロバスト分散の発想。ここでは「データのばらつき」と「DP ノイズ」を両方含む形に拡張している。</p>
+</blockquote>
+<h2 id="4-algorithm-3">4. Algorithm 3: 合成データ生成</h2>
+<p>合成データは、回帰と同じ集約量から bin 単位で標本を生成する <a href="#ref1">[1]</a>。各 bin の private な count・sum から、その bin 内の点を再構成する。</p>
+<p>重要なのは、回帰と合成が<strong>同じノイズ実現を共有できる</strong>点である（Corollary 3.1）<a href="#ref1">[1]</a>。これにより、追加のプライバシー予算を消費せずに、同一の <span class="arithmatex">\(\mu\)</span> で回帰係数と合成データの両方を出力できる。</p>
+<blockquote>
+<p>💡 直感: ノイズ入り集約量は一度作れば後処理に過ぎない。DP の後処理不変性により、同じ集約から何を導いても追加の予算は要らない。</p>
+</blockquote>
+<h2 id="5-3-options">5. 実装の 3 つの使い方（Options）</h2>
+<p>実装は用途に応じて 3 通りの呼び出しを提供する <a href="#ref2">[2]</a>。</p>
+<ul>
+<li><strong>Option A — 回帰のみ</strong>: <code>dp_linear_regression</code>。係数と CI だけが必要な場合。</li>
+<li><strong>Option B — 回帰 + 合成（予算共有）</strong>: <code>dp_linear_regression(..., return_synthetic=True)</code>。同一予算で回帰結果と合成データを同時取得。</li>
+<li><strong>Option C — 合成のみ</strong>: <code>generate_synthetic_data</code>。合成データだけが必要な場合。</li>
+</ul>
+<blockquote>
+<p>⚠️ 注意: A と B の回帰係数は分布としては同等だが、ノイズ実現が異なるため返る数値は一致しない。再現したいときは <code>random_state</code> を固定する。</p>
+</blockquote>
+<h2 id="6">6. 主なパラメータ</h2>
+<table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mu</code></td>
+<td>総プライバシー予算（<span class="arithmatex">\(\mu\)</span>-GDP）。大きいほど精度↑・プライバシー↓</td>
+</tr>
+<tr>
+<td><code>alpha</code></td>
+<td>CI の有意水準（既定 <code>0.05</code> = 95% CI）</td>
+</tr>
+<tr>
+<td><code>budget_ratios</code></td>
+<td>binning/count/sum_x/sum_y への予算配分（既定 <code>1,3,3,3</code>）</td>
+</tr>
+<tr>
+<td><code>min_count</code></td>
+<td>この件数未満の bin を除去（既定 2）</td>
+</tr>
+<tr>
+<td><code>clip</code></td>
+<td><code>bounds</code> 外の値をクリップ</td>
+</tr>
+<tr>
+<td><code>preserve_sample_size</code></td>
+<td>合成件数を元の <span class="arithmatex">\(n\)</span> に合わせる</td>
+</tr>
+<tr>
+<td><code>random_state</code></td>
+<td>乱数シード（再現性）</td>
+</tr>
+<tr>
+<td><code>x_bounds</code> / <code>y_bounds</code></td>
+<td>変数の取りうる範囲。<strong>解析者がドメイン知識で与える</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 注意: <code>x_bounds</code> / <code>y_bounds</code> をデータから計算してはいけない。データ依存の境界はそれ自体が漏えい経路になる。必ずドメイン知識など外生的な根拠で指定する <a href="#ref1">[1]</a>。</p>
+</blockquote>
+<p>なお実装は <span class="arithmatex">\(\mu\)</span>-GDP と <span class="arithmatex">\((\varepsilon,\delta)\)</span>-DP の換算関数（<code>delta_from_gdp</code> など）も提供しており、慣れた <span class="arithmatex">\((\varepsilon,\delta)\)</span> 表現でのプライバシー会計と相互変換できる <a href="#ref2">[2]</a>。</p>
+<h2 id="7-mu">7. 直感の補足: <span class="arithmatex">\(\mu\)</span> を動かすと何が起きるか</h2>
+<p><span class="arithmatex">\(\mu\)</span> を上げると注入ノイズの分散が下がる。その結果として:</p>
+<ul>
+<li>ノイズが小さくなるので PrivTree がデータ空間をより細かく分割でき、bin の解像度が上がる。</li>
+<li>バイアス補正項 <span class="arithmatex">\(\tilde D\)</span> が小さくなり、推定の精度（係数・CI の幅）が向上する。</li>
+<li>ただし、その代償としてプライバシー保証は弱まる。</li>
+</ul>
+<blockquote>
+<p>💡 直感: <span class="arithmatex">\(\mu\)</span> は「精度とプライバシーのつまみ」。BinAgg のバイアス補正とサンドイッチ分散は、どの <span class="arithmatex">\(\mu\)</span> でも点推定の偏りと CI の被覆を妥当に保つことを狙う設計である。</p>
+</blockquote>
+<h2 id="_1">参照</h2>
+<ol class="refs">
+<li id="ref1">Lin, S., Slavković, A., &amp; Bhoomireddy, D. R. (2026). <em>Differentially Private Linear Regression and Synthetic Data Generation with Statistical Guarantees.</em> AISTATS 2026 (PMLR). arXiv:2510.16974. <a href="https://arxiv.org/abs/2510.16974">https://arxiv.org/abs/2510.16974</a></li>
+<li id="ref2">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27). <a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
+</ol></article>
+</div>
+<div class="footer">BinAgg 再現追試 · BinAgg のアルゴリズムと直感 · build: scripts/03_build_html.py · source: <code>content/method-binagg.md</code></div>
+</body></html>

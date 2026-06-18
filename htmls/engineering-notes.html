@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>エンジニアリング — BinAgg 再現追試</title>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<style>
+:root{--fg:#1a1a1a;--muted:#666;--accent:#c0392b;--link:#1565c0;--line:#e3e3e3;
+--bg:#f3f4f6;--card:#fff;--code:#f6f8fa;--sidebar:#fbfbfc;--chip:#eef4fb;--chipline:#cfe0f3}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;line-height:1.85}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+/* hero + tabs */
+.hero{background:linear-gradient(135deg,#2c3e50 0%,#c0392b 130%);color:#fff}
+.hero .inner{max-width:1180px;margin:0 auto;padding:26px 20px 0}
+.hero h1{margin:0 0 4px;font-size:1.6rem}
+.hero p{margin:0 0 16px;opacity:.92;font-size:.95rem}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs a{color:#fff;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:8px 8px 0 0;
+font-size:.9rem;white-space:nowrap}
+nav.tabs a:hover{background:rgba(255,255,255,.26);text-decoration:none}
+nav.tabs a.active{background:var(--bg);color:var(--accent);font-weight:600}
+/* layout */
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px 40px;display:grid;
+grid-template-columns:250px 1fr;gap:32px}
+nav.toc{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;
+background:var(--sidebar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+nav.toc .toc-title{font-weight:700;margin-bottom:6px}
+nav.toc ul{list-style:none;margin:0;padding-left:0}
+nav.toc li{margin:2px 0}
+nav.toc a{color:var(--muted);display:block;padding:2px 6px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+nav.toc a:hover{color:var(--accent);background:#fff;text-decoration:none}
+nav.toc ul ul a{padding-left:18px;font-size:12.5px}
+/* article card */
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;
+box-shadow:0 1px 10px rgba(0,0,0,.04);padding:12px 40px 56px;min-width:0}
+article>h1:first-of-type{display:none}
+article :is(h2,h3,h4){scroll-margin-top:16px}
+article h2{font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:1.9em}
+article h3{font-size:1.16rem;margin-top:1.6em}
+article h4{font-size:1rem;color:var(--accent)}
+code{background:var(--code);padding:.12em .4em;border-radius:6px;font-size:88%;
+font-family:"Cascadia Code",Consolas,"SF Mono",monospace}
+pre{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 13px}
+th{background:#f2f4f7}
+tr:nth-child(2n){background:#fbfbfc}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin:1.2em auto;display:block}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:4px solid var(--accent);
+background:#fdf3f2;border-radius:0 8px 8px 0;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.2em 0}
+/* citation chips */
+a[href^="#ref"]{font-size:.72em;vertical-align:super;line-height:0;background:var(--chip);
+border:1px solid var(--chipline);border-radius:4px;padding:0 4px;color:var(--link);text-decoration:none}
+a[href^="#ref"]:hover{background:#dceaf8}
+ol.refs{font-size:.92rem;color:#333;padding-left:1.4em}
+ol.refs li{margin:.4em 0}
+ol.refs li:target{background:#fff6d6;border-radius:4px}
+.footer{max-width:1180px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:860px){.layout{grid-template-columns:1fr}nav.toc{position:static;max-height:none}
+article{padding:12px 18px 40px}}
+</style></head>
+<body>
+<header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>環境構築・再現手順・落とし穴</p></div>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="data-notes.html">🔬 前処理・データ</a><a href="engineering-notes.html" class="active">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<div class="layout">
+<nav class="toc"><div class="toc-title">目次</div><div class="toc">
+<ul>
+<li><a href="#_2">動作環境</a></li>
+<li><a href="#_3">セットアップ</a></li>
+<li><a href="#_4">実験の実行</a></li>
+<li><a href="#_5">サイトのビルドと公開</a></li>
+<li><a href="#_6">落とし穴と対処</a><ul>
+<li><a href="#_7">スモークテストを先に通す</a></li>
+<li><a href="#windows">Windows シェルのパス</a></li>
+<li><a href="#_8">改行コードの警告</a></li>
+<li><a href="#github-actions-node">GitHub Actions の Node 警告</a></li>
+<li><a href="#mathjax">MathJax の表示数式がリスト内で崩れる</a></li>
+<li><a href="#air-quality-200">Air Quality の欠損値 -200</a></li>
+</ul>
+</li>
+<li><a href="#_9">リポジトリ構成</a></li>
+<li><a href="#_10">参照</a></li>
+</ul>
+</div>
+</nav>
+<article><h1 id="_1">エンジニアリングと再現手順</h1>
+<p>本ページは、BinAgg の再現追試リポジトリ <code>tpdp2026-binagg</code> を <strong>clone-and-run</strong> で再現するための実装ノートです。環境構築・実験実行・サイトビルド・既知の落とし穴を、実際に踏んだ手順そのままに記録します。コマンドは Windows 11 + git-bash を前提に動く形で示します。</p>
+<h2 id="_2">動作環境</h2>
+<ul>
+<li>OS: Windows 11</li>
+<li>シェル: git-bash（Unix 風のパス区切り <code>/</code> を使う）</li>
+<li>パッケージマネージャ: uv 0.11.6</li>
+<li>Python: <strong>3.12.12 を固定</strong></li>
+</ul>
+<blockquote>
+<p>⚠️ 落とし穴: システムにインストールされている Python は 3.14 ですが、numpy・scipy・pandas の wheel がまだ 3.14 を十分にカバーしておらず、ソースビルドに落ちて失敗します。<code>uv venv --python 3.12</code> で <strong>3.12 系を明示的に固定</strong>してください。</p>
+</blockquote>
+<p>仮想環境は <code>.venv</code> に作成します。Windows では Python 本体は <code>.venv/Scripts/python.exe</code> に置かれます（POSIX の <code>.venv/bin/</code> ではありません）。本ページのコマンドはすべてこのパスを直接叩く形で書きます。</p>
+<h2 id="_3">セットアップ</h2>
+<pre><code class="language-bash">uv venv --python 3.12 .venv
+uv pip install --python .venv -r requirements.txt \
+  &quot;git+https://github.com/Shuronglin/BinAgg.git@13c09bb&quot;
+</code></pre>
+<p>固定している依存は以下のとおりです（<code>requirements.txt</code>）。</p>
+<ul>
+<li>数値・データ処理: <code>numpy==2.4.6</code>, <code>scipy==1.17.1</code>, <code>pandas==3.0.3</code>, <code>scikit-learn==1.9.0</code>, <code>matplotlib==3.11.0</code></li>
+<li>サイトビルド用: <code>markdown==3.10.2</code>, <code>pymdown-extensions==10.21.3</code></li>
+</ul>
+<p>BinAgg は再現したコミット <code>13c09bb</code>（2026-05-27）に固定してインストールします。BinAgg 本体の依存は <code>numpy&gt;=1.20</code>, <code>scipy&gt;=1.7</code> のみと軽量で、上で固定したバージョンに収まります <a href="#ref2">[2]</a>。</p>
+<blockquote>
+<p>💡 ヒント: <code>requirements.txt</code> には BinAgg 自体は書かず、フル SHA <code>13c09bb3e32f9a2c2915df3599d99b79a057b05d</code> をコメントで残しています。短縮 <code>13c09bb</code> でもインストールできますが、厳密に再現したい場合はフル SHA を使ってください。</p>
+</blockquote>
+<h2 id="_4">実験の実行</h2>
+<p>3 本のスクリプトを順に実行します。いずれも引数なしで動きます。</p>
+<pre><code class="language-bash">.venv/Scripts/python.exe scripts/01_sim_coverage.py      # E1 CI被覆率
+.venv/Scripts/python.exe scripts/02_synthetic_utility.py # E2 合成データの回帰有用性
+.venv/Scripts/python.exe scripts/03_real_airquality.py   # E3 実データ(Air Quality)
+</code></pre>
+<p>各スクリプトは 1 回の実行で <code>results/*.json</code> / <code>results/*.csv</code> と <code>results/figures/*.png</code> を生成します。全乱数はシード固定で、同じ環境であれば結果は再現します。</p>
+<p>所要時間の目安（参考値）:</p>
+<table>
+<thead>
+<tr>
+<th>実験</th>
+<th>内容</th>
+<th>目安</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>CI 被覆率シミュレーション</td>
+<td>約 16 秒</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>合成データの回帰有用性</td>
+<td>約 3 秒</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>実データ（Air Quality）</td>
+<td>約 9 秒</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 ヒント: 共通処理（シード設定・出力先の作成・図の保存など）は <code>scripts/common.py</code> にまとまっています。新しい実験を足すときはここを再利用してください。</p>
+</blockquote>
+<h2 id="_5">サイトのビルドと公開</h2>
+<p><code>content/*.md</code>（手書き Markdown）を <code>htmls/*.html</code>（自己完結 HTML）へ変換するビルダーが <code>scripts/03_build_html.py</code> です。</p>
+<pre><code class="language-bash">uv pip install --python .venv markdown pymdown-extensions
+.venv/Scripts/python.exe scripts/03_build_html.py
+</code></pre>
+<p>ビルダーの設計上のポイント:</p>
+<ul>
+<li><strong>図は base64 埋め込み</strong>: 生成 HTML は単体で共有できる自己完結ファイルになります。</li>
+<li><strong>数式は MathJax + <code>pymdownx.arithmatex</code></strong>（<code>generic: True</code>）でレンダリングします。</li>
+<li><strong>ページ構成はビルダー内の <code>PAGES</code> テーブルが単一の真実 (single source of truth)</strong>。上部タブナビと目次サイドバー（h2/h3 から自動生成）はここから注入されます。ページを追加・改名するときは <code>PAGES</code> を編集します。</li>
+</ul>
+<p>ビルドは Markdown→HTML 変換のみなので数十秒で終わります。実験を回し直す必要はありません。</p>
+<p>公開は GitHub Actions（<code>.github/workflows/deploy-pages.yml</code>）が <code>htmls/</code> を GitHub Pages へデプロイします。Pages 側の build_type は <strong>workflow</strong> に設定します（ブランチ公開ではありません）。</p>
+<blockquote>
+<p>⚠️ 落とし穴: <code>htmls/</code> はビルド成果物です。<strong>直接編集しないでください</strong>。手で直しても次のビルドで上書きされます。本文の修正は必ず <code>content/*.md</code> 側で行います。</p>
+</blockquote>
+<h2 id="_6">落とし穴と対処</h2>
+<p>実際に踏んだものを「問題 → 詳細 → 対処」で残します。</p>
+<h3 id="_7">スモークテストを先に通す</h3>
+<ul>
+<li>問題: 重い実験をいきなり回すと、binagg のインストール不備に最後まで気づけない。</li>
+<li>詳細: 環境構築直後は import や基本動作が壊れていることがある。</li>
+<li>対処: 本実験の前に <strong>BinAgg 同梱の example を 1 本動かして</strong> import と基本動作を確認し、緑になってから E1〜E3 に進む。</li>
+</ul>
+<h3 id="windows">Windows シェルのパス</h3>
+<ul>
+<li>問題: POSIX 流のコマンドがそのまま動かない。</li>
+<li>詳細: venv のバイナリは <code>bin/</code> ではなく <code>Scripts/</code> 配下。</li>
+<li>対処: パスは <code>/</code> 区切りで書き、Python は <code>.venv/Scripts/python.exe</code> を直接呼ぶ。出力捨て先は <code>NUL</code> ではなく <strong><code>/dev/null</code></strong> を使う（git-bash 前提）。</li>
+</ul>
+<h3 id="_8">改行コードの警告</h3>
+<ul>
+<li>問題: <code>git add</code> 時に <code>LF will be replaced by CRLF</code> が出る。</li>
+<li>詳細: Windows の自動改行変換による警告。</li>
+<li>対処: <strong>無害</strong>。そのまま進めてよい。</li>
+</ul>
+<h3 id="github-actions-node">GitHub Actions の Node 警告</h3>
+<ul>
+<li>問題: ログに <code>Node.js 20 is deprecated</code> が出る。</li>
+<li>詳細: 一部アクションのランタイム表記に由来する警告。各アクションは実際には Node 24 で実行され成功している。</li>
+<li>対処: <strong>無害</strong>。デプロイ結果が success なら問題なし。</li>
+</ul>
+<h3 id="mathjax">MathJax の表示数式がリスト内で崩れる</h3>
+<ul>
+<li>問題: <code>$$...$$</code> の表示数式が変換されず、生の <code>$</code> が残る。</li>
+<li>詳細: リスト項目のインデント下に置くと Markdown がブロック数式として認識しない。</li>
+<li>対処: 表示数式は<strong>独立行に、前後を空行で囲んで</strong>書く。リストの中に押し込まない。</li>
+</ul>
+<h3 id="air-quality-200">Air Quality の欠損値 <code>-200</code></h3>
+<ul>
+<li>問題: 実データで一部の値が <code>-200</code> になっている。</li>
+<li>詳細: Air Quality データセットでは欠損が <code>-200</code> というセンチネル値で表現されており、そのまま数値計算すると結果が壊れる前処理上の罠。</li>
+<li>対処: 前処理で <code>-200</code> を欠損として扱う。詳細は「前処理とドメイン特化メモ」ページを参照。</li>
+</ul>
+<h2 id="_9">リポジトリ構成</h2>
+<pre><code>tpdp2026-binagg/
+├── content/            # 手書きの Markdown（編集する本文）
+├── htmls/              # ビルド成果物（直接編集しない）
+├── scripts/            # 実験スクリプト + サイトビルダー
+│   ├── common.py
+│   ├── 01_sim_coverage.py
+│   ├── 02_synthetic_utility.py
+│   ├── 03_real_airquality.py
+│   └── 03_build_html.py   # content/*.md -&gt; htmls/*.html（PAGES が単一の真実）
+├── data/               # 入力データ
+├── results/            # 実験出力（json/csv, figures/*.png）
+├── requirements.txt    # 固定依存
+└── .github/workflows/  # deploy-pages.yml（Pages へデプロイ）
+</code></pre>
+<h2 id="_10">参照</h2>
+<ol class="refs">
+<li id="ref2">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27). <a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
+</ol></article>
+</div>
+<div class="footer">BinAgg 再現追試 · 環境構築・再現手順・落とし穴 · build: scripts/03_build_html.py · source: <code>content/engineering-notes.md</code></div>
+</body></html>

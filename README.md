@@ -5,10 +5,22 @@ Statistical Guarantees* (Lin, Slavković & Bhoomireddy, AISTATS 2026,
 [arXiv:2510.16974](https://arxiv.org/abs/2510.16974)) の DP 線形回帰＋統計的保証付き
 合成データ生成を、公式実装 [BinAgg](https://github.com/Shuronglin/BinAgg) で再現追試する。
 
-- **公開レポート (GitHub Pages)**: https://gghatano.github.io/tpdp2026-binagg/
-- **レポート本体 (Markdown)**: [content/REPORT.md](content/REPORT.md)
-- **実験計画**: [docs/plans/experiment-plan.md](docs/plans/experiment-plan.md)
+- **公開サイト (GitHub Pages)**: https://gghatano.github.io/tpdp2026-binagg/
 - **元 Issue**: https://github.com/pwscup/tpdp2026/issues/16
+
+公開サイトは「論文体のクリーンな本体（レポート）＋補助タブ」の二層構成。本文は本体に、用語・手法・前処理・
+環境・QA などの補足は別タブに分けてある。
+
+| ページ (タブ) | Markdown | 役割 |
+|---|---|---|
+| 📄 レポート | [content/index.md](content/index.md) | 論文本体（アブストラクト〜結論・参考文献） |
+| 📐 用語と記法 | [content/notation.md](content/notation.md) | 用語・記号の定義 |
+| 🧩 手法詳細 | [content/method-binagg.md](content/method-binagg.md) | BinAgg のアルゴリズムと直感 |
+| 🔬 前処理・データ | [content/data-notes.md](content/data-notes.md) | 前処理の工夫・ドメイン知識・`-200` 知見 |
+| 🛠 エンジニアリング | [content/engineering-notes.md](content/engineering-notes.md) | 環境構築・再現手順・落とし穴 |
+| ❓ QA・メモ | [content/faq.md](content/faq.md) | よくある疑問と設計判断 |
+
+- **実験計画**: [docs/plans/experiment-plan.md](docs/plans/experiment-plan.md)
 
 ## セットアップと実行
 
@@ -26,27 +38,30 @@ uv pip install --python .venv -r requirements.txt \
 ## サイトのビルド & 公開
 
 ```bash
-uv pip install --python .venv markdown   # ビルド依存
-.venv/Scripts/python.exe scripts/03_build_html.py   # content/*.md -> htmls/*.html（図は base64 埋め込み）
+uv pip install --python .venv markdown pymdown-extensions   # ビルド依存
+.venv/Scripts/python.exe scripts/03_build_html.py   # content/*.md -> htmls/*.html
 ```
 
-`main` への push で `.github/workflows/deploy-pages.yml` が `htmls/` を GitHub Pages へデプロイする。
-ページ構成は `scripts/03_build_html.py` の `PAGES` テーブルが単一の真実。
+ビルダーは各 Markdown を自己完結 HTML 化する（図は base64 埋め込み、数式は MathJax + arithmatex、
+ヒーロー＋上部タブ＋目次サイドバーを注入）。`main` への push で `.github/workflows/deploy-pages.yml` が
+`htmls/` を GitHub Pages へデプロイする。**ページ構成（タブ・順序）は `scripts/03_build_html.py` の
+`PAGES` テーブルが単一の真実**。`htmls/` は成果物なので直接編集しない。
 
 ## 構成
 
 ```
 .
-├── content/REPORT.md          … 追試レポート（Abstract〜結論・限界・References）
+├── content/                   … 手で書く Markdown（index=本体 + 補助5ページ）
+├── htmls/                     … ビルド成果物（直接編集しない・Pages 公開元）
 ├── docs/plans/                … 実験計画（指標・ベースライン・予算）
-├── scripts/                   … common.py + E1/E2/E3 実行スクリプト
+├── scripts/                   … common.py + E1/E2/E3 + 03_build_html.py（サイトビルダー）
 ├── data/AirQualityUCI.csv     … 実データ（BinAgg 同梱）
 ├── results/                   … JSON/CSV/図（実験出力）
 ├── requirements.txt           … 固定環境
 └── .claude/                   … tabular-sdg-skillset（プロセススキル一式）
 ```
 
-## 主な結果（詳細は REPORT.md）
+## 主な結果（詳細は公開サイトの 📄 レポート）
 
 | 実験 | 要点 |
 |---|---|

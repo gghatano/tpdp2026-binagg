@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA・メモ — BinAgg 再現追試</title>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<style>
+:root{--fg:#1a1a1a;--muted:#666;--accent:#c0392b;--link:#1565c0;--line:#e3e3e3;
+--bg:#f3f4f6;--card:#fff;--code:#f6f8fa;--sidebar:#fbfbfc;--chip:#eef4fb;--chipline:#cfe0f3}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;line-height:1.85}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+/* hero + tabs */
+.hero{background:linear-gradient(135deg,#2c3e50 0%,#c0392b 130%);color:#fff}
+.hero .inner{max-width:1180px;margin:0 auto;padding:26px 20px 0}
+.hero h1{margin:0 0 4px;font-size:1.6rem}
+.hero p{margin:0 0 16px;opacity:.92;font-size:.95rem}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs a{color:#fff;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:8px 8px 0 0;
+font-size:.9rem;white-space:nowrap}
+nav.tabs a:hover{background:rgba(255,255,255,.26);text-decoration:none}
+nav.tabs a.active{background:var(--bg);color:var(--accent);font-weight:600}
+/* layout */
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px 40px;display:grid;
+grid-template-columns:250px 1fr;gap:32px}
+nav.toc{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;
+background:var(--sidebar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+nav.toc .toc-title{font-weight:700;margin-bottom:6px}
+nav.toc ul{list-style:none;margin:0;padding-left:0}
+nav.toc li{margin:2px 0}
+nav.toc a{color:var(--muted);display:block;padding:2px 6px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+nav.toc a:hover{color:var(--accent);background:#fff;text-decoration:none}
+nav.toc ul ul a{padding-left:18px;font-size:12.5px}
+/* article card */
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;
+box-shadow:0 1px 10px rgba(0,0,0,.04);padding:12px 40px 56px;min-width:0}
+article>h1:first-of-type{display:none}
+article :is(h2,h3,h4){scroll-margin-top:16px}
+article h2{font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:1.9em}
+article h3{font-size:1.16rem;margin-top:1.6em}
+article h4{font-size:1rem;color:var(--accent)}
+code{background:var(--code);padding:.12em .4em;border-radius:6px;font-size:88%;
+font-family:"Cascadia Code",Consolas,"SF Mono",monospace}
+pre{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 13px}
+th{background:#f2f4f7}
+tr:nth-child(2n){background:#fbfbfc}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin:1.2em auto;display:block}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:4px solid var(--accent);
+background:#fdf3f2;border-radius:0 8px 8px 0;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.2em 0}
+/* citation chips */
+a[href^="#ref"]{font-size:.72em;vertical-align:super;line-height:0;background:var(--chip);
+border:1px solid var(--chipline);border-radius:4px;padding:0 4px;color:var(--link);text-decoration:none}
+a[href^="#ref"]:hover{background:#dceaf8}
+ol.refs{font-size:.92rem;color:#333;padding-left:1.4em}
+ol.refs li{margin:.4em 0}
+ol.refs li:target{background:#fff6d6;border-radius:4px}
+.footer{max-width:1180px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:860px){.layout{grid-template-columns:1fr}nav.toc{position:static;max-height:none}
+article{padding:12px 18px 40px}}
+</style></head>
+<body>
+<header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>よくある疑問と設計判断</p></div>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="data-notes.html">🔬 前処理・データ</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html" class="active">❓ QA・メモ</a></nav></header>
+<div class="layout">
+<nav class="toc"><div class="toc-title">目次</div><div class="toc">
+<ul>
+<li><a href="#_1">プライバシー予算とトレードオフ</a><ul>
+<li><a href="#q-mu">Q. プライバシー予算 \(\mu\) はどう選ぶ?</a></li>
+<li><a href="#q-95-095-092093">Q. なぜ 95% 信頼区間の被覆率が 0.95 を少し下回る (0.92–0.93) のか?</a></li>
+<li><a href="#q-naive-008032">Q. なぜノイズを無視した素朴 (naive) 区間は被覆を大きく失う (0.08–0.32) のか?</a></li>
+</ul>
+</li>
+<li><a href="#_2">点推定・分散推定の挙動</a><ul>
+<li><a href="#q-e1-naive">Q. E1 で点推定のバイアスが補正版と naive でほぼ同じだったのはなぜ?</a></li>
+<li><a href="#q-e3-dp-ols">Q. E3 で実データの DP 係数が非プライベート OLS と一致しないのは手法が悪いから?</a></li>
+</ul>
+</li>
+<li><a href="#_3">合成データと評価方針</a><ul>
+<li><a href="#q-ols">Q. 合成データにそのまま通常の OLS を当ててよい?</a></li>
+<li><a href="#q-tvd">Q. なぜ合成データの良さを TVD (周辺分布の一致) でなく回帰で測るのか?</a></li>
+<li><a href="#q-option-abc">Q. Option A/B/C の違いは?</a></li>
+</ul>
+</li>
+<li><a href="#_4">一般化と今後</a><ul>
+<li><a href="#q">Q. この結果はどこまで一般化できる?</a></li>
+<li><a href="#q_1">Q. 次にやるべきことは?</a></li>
+</ul>
+</li>
+<li><a href="#_5">参照</a></li>
+</ul>
+</div>
+</nav>
+<article><h1 id="qa">QA・メモ</h1>
+<p>このページは、BinAgg による差分プライバシー（DP）線形回帰の再現追試に関して、よく寄せられる疑問と、本追試での設計判断をまとめた FAQ です。手法や前処理の詳細は別ページ（「用語と記法」「BinAgg 手法詳細」「前処理とドメイン特化メモ」「エンジニアリングと再現手順」）も参照してください。</p>
+<blockquote>
+<p>📘 凡例: 事実には出典チップ（例 <a href="#ref1">[1]</a> / <a href="#ref2">[2]</a>）を付けます。チップの無い記述は本追試での実測・解釈であり、推定を含む箇所は「〜と考えられる」「本実験条件では」と推定調で示します。</p>
+</blockquote>
+<h2 id="_1">プライバシー予算とトレードオフ</h2>
+<h3 id="q-mu">Q. プライバシー予算 <span class="arithmatex">\(\mu\)</span> はどう選ぶ?</h3>
+<p><span class="arithmatex">\(\mu\)</span> はガウス機構の DP 保証を表すパラメータで、小さいほど加えるノイズが大きく、強いプライバシー保護と引き換えに精度が下がります。逆に <span class="arithmatex">\(\mu\)</span> が大きいほどノイズは小さく、精度は上がりますが保護は弱くなります。</p>
+<p>BinAgg の README は目安として、<span class="arithmatex">\(\mu \le 0.5\)</span> を強い保護、<span class="arithmatex">\(0.5 &lt; \mu \le 1.5\)</span> を中程度、<span class="arithmatex">\(\mu &gt; 1.5\)</span> を弱い保護としています <a href="#ref2">[2]</a>。本追試ではこの幅をまたぐように <span class="arithmatex">\(\mu \in \{0.5, 1, 2, 5\}\)</span> を取り、精度とのトレードオフを観測しました。</p>
+<blockquote>
+<p>💡 「どの <span class="arithmatex">\(\mu\)</span> が正解」ということはなく、許容できる保護水準と必要な精度のバランスで決める運用パラメータと考えられます。</p>
+</blockquote>
+<h3 id="q-95-095-092093">Q. なぜ 95% 信頼区間の被覆率が 0.95 を少し下回る (0.92–0.93) のか?</h3>
+<p>ここで構成している信頼区間は漸近的なもの、すなわち標本数が大きくなる極限で正当化されるものです。有限標本では正規近似の誤差が残るため、被覆率は名目値の 0.95 を僅かに下回る、と考えられます。本実験条件で観測された 0.92–0.93 はこの範囲に収まっています。</p>
+<p><span class="arithmatex">\(n\)</span> やビン数を増やしたときに被覆率が 0.95 へ近づくかを確かめる感度分析は、今後の課題です。</p>
+<h3 id="q-naive-008032">Q. なぜノイズを無視した素朴 (naive) 区間は被覆を大きく失う (0.08–0.32) のか?</h3>
+<p>これは点推定ではなく分散推定の問題です。naive な区間は標準誤差の計算に DP ノイズの分散を勘定に入れていません（本追試の実装では <span class="arithmatex">\(\sigma^2 = 1\)</span> 相当のプレースホルダを用いています）。その結果、区間が実際の不確実性に比べて狭くなりすぎ、真値を含む割合が激減します。</p>
+<blockquote>
+<p>⚠️ 点推定が同程度に正確でも、分散を正しく見積もらなければ信頼区間は信頼できません。被覆率はまさにこの分散推定の質を映す指標です。</p>
+</blockquote>
+<h2 id="_2">点推定・分散推定の挙動</h2>
+<h3 id="q-e1-naive">Q. E1 で点推定のバイアスが補正版と naive でほぼ同じだったのはなぜ?</h3>
+<p>本実験は条件数の良い一様計画を用いており、バイアス補正行列 <span class="arithmatex">\(\tilde D\)</span> が点推定に与える影響が相対的に小さかったため、と考えられます。E1 で補正版と naive を分けたのは点推定の差ではなく、分散推定（サンドイッチ標準誤差）の質でした。</p>
+<p>設計行列が悪条件の場合は点推定にも差が出うると考えられますが、本実験条件では確認していません。</p>
+<h3 id="q-e3-dp-ols">Q. E3 で実データの DP 係数が非プライベート OLS と一致しないのは手法が悪いから?</h3>
+<p>いいえ。主因はデータ側にあります。Air Quality データの欠損センチネル <code>-200</code> が OLS 参照側を汚染しており、一方 DP 経路は bounds でクリップした後の値を見ます。つまり両者はそもそも別物を比較している状態です。</p>
+<p>したがって、本データでは「DP-OLS 係数の一致」は妥当な有用性指標になりません。CI 幅や、クリップ後を基準とした合成モーメント誤差の方が信頼できる指標と考えられます（詳細は「前処理とドメイン特化メモ」を参照）。</p>
+<h2 id="_3">合成データと評価方針</h2>
+<h3 id="q-ols">Q. 合成データにそのまま通常の OLS を当ててよい?</h3>
+<p>避けるべきです。合成データへ素朴に OLS を当てると係数が偏ります（E2 では相対 L2 誤差が大きく出ました）。BinAgg のバイアス補正推定を使うと真値に近づきます。論文の方針では、有用性は「回帰の統計的保証」で測るのが基本です <a href="#ref1">[1]</a>。</p>
+<h3 id="q-tvd">Q. なぜ合成データの良さを TVD (周辺分布の一致) でなく回帰で測るのか?</h3>
+<p>論文の主眼が「回帰分析の保証」、すなわち点推定の正しさと信頼区間の妥当性にあるからです <a href="#ref1">[1]</a>。回帰による評価は周辺分布の一致よりも厳しく、下流の統計推論に直結する実用的な基準だと考えられます。</p>
+<blockquote>
+<p>📘 周辺分布が一致していても、回帰係数や標準誤差が偏れば下流の推論は誤ります。回帰での評価はその点をより直接に突きます。</p>
+</blockquote>
+<h3 id="q-option-abc">Q. Option A/B/C の違いは?</h3>
+<p>予算の使い道が異なる 3 つのモードです <a href="#ref2">[2]</a>。</p>
+<ul>
+<li>A = 回帰のみ</li>
+<li>B = 回帰 + 合成（予算を共有）</li>
+<li>C = 合成のみ</li>
+</ul>
+<p>A と B の係数は分布としては同等ですが、ノイズの実現値が異なるため、個々の数値は一致しません（詳細は「BinAgg 手法詳細」を参照）。</p>
+<h2 id="_4">一般化と今後</h2>
+<h3 id="q">Q. この結果はどこまで一般化できる?</h3>
+<p>限定的な確認にとどまります。E1 と E2 は単一の線形生成過程に基づき、E3 は単一の実データに基づきます。特徴分布・次元・条件数・誤差分布の多様化や、複数データセットへの拡張が必要、と考えられます。</p>
+<h3 id="q_1">Q. 次にやるべきことは?</h3>
+<p>次の 4 点を優先課題と考えています。</p>
+<ul>
+<li>(a) <code>-200</code> を除去した正しい前処理での再評価</li>
+<li>(b) 論文本文の図表との定量的な照合</li>
+<li>(c) 設定を広げた感度分析（<span class="arithmatex">\(n\)</span>・ビン数・条件数・<span class="arithmatex">\(\mu\)</span> の範囲など）</li>
+<li>(d) bounds を private に推定する経路の評価</li>
+</ul>
+<h2 id="_5">参照</h2>
+<ol class="refs">
+<li id="ref1">Lin, S., Slavković, A., &amp; Bhoomireddy, D. R. (2026). <em>Differentially Private Linear Regression and Synthetic Data Generation with Statistical Guarantees.</em> AISTATS 2026 (PMLR). arXiv:2510.16974. <a href="https://arxiv.org/abs/2510.16974">https://arxiv.org/abs/2510.16974</a></li>
+<li id="ref2">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27). <a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
+</ol></article>
+</div>
+<div class="footer">BinAgg 再現追試 · よくある疑問と設計判断 · build: scripts/03_build_html.py · source: <code>content/faq.md</code></div>
+</body></html>

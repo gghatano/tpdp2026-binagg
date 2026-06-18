@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前処理・データ — BinAgg 再現追試</title>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<style>
+:root{--fg:#1a1a1a;--muted:#666;--accent:#c0392b;--link:#1565c0;--line:#e3e3e3;
+--bg:#f3f4f6;--card:#fff;--code:#f6f8fa;--sidebar:#fbfbfc;--chip:#eef4fb;--chipline:#cfe0f3}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;line-height:1.85}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+/* hero + tabs */
+.hero{background:linear-gradient(135deg,#2c3e50 0%,#c0392b 130%);color:#fff}
+.hero .inner{max-width:1180px;margin:0 auto;padding:26px 20px 0}
+.hero h1{margin:0 0 4px;font-size:1.6rem}
+.hero p{margin:0 0 16px;opacity:.92;font-size:.95rem}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs a{color:#fff;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:8px 8px 0 0;
+font-size:.9rem;white-space:nowrap}
+nav.tabs a:hover{background:rgba(255,255,255,.26);text-decoration:none}
+nav.tabs a.active{background:var(--bg);color:var(--accent);font-weight:600}
+/* layout */
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px 40px;display:grid;
+grid-template-columns:250px 1fr;gap:32px}
+nav.toc{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;
+background:var(--sidebar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+nav.toc .toc-title{font-weight:700;margin-bottom:6px}
+nav.toc ul{list-style:none;margin:0;padding-left:0}
+nav.toc li{margin:2px 0}
+nav.toc a{color:var(--muted);display:block;padding:2px 6px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+nav.toc a:hover{color:var(--accent);background:#fff;text-decoration:none}
+nav.toc ul ul a{padding-left:18px;font-size:12.5px}
+/* article card */
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;
+box-shadow:0 1px 10px rgba(0,0,0,.04);padding:12px 40px 56px;min-width:0}
+article>h1:first-of-type{display:none}
+article :is(h2,h3,h4){scroll-margin-top:16px}
+article h2{font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:1.9em}
+article h3{font-size:1.16rem;margin-top:1.6em}
+article h4{font-size:1rem;color:var(--accent)}
+code{background:var(--code);padding:.12em .4em;border-radius:6px;font-size:88%;
+font-family:"Cascadia Code",Consolas,"SF Mono",monospace}
+pre{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 13px}
+th{background:#f2f4f7}
+tr:nth-child(2n){background:#fbfbfc}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin:1.2em auto;display:block}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:4px solid var(--accent);
+background:#fdf3f2;border-radius:0 8px 8px 0;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.2em 0}
+/* citation chips */
+a[href^="#ref"]{font-size:.72em;vertical-align:super;line-height:0;background:var(--chip);
+border:1px solid var(--chipline);border-radius:4px;padding:0 4px;color:var(--link);text-decoration:none}
+a[href^="#ref"]:hover{background:#dceaf8}
+ol.refs{font-size:.92rem;color:#333;padding-left:1.4em}
+ol.refs li{margin:.4em 0}
+ol.refs li:target{background:#fff6d6;border-radius:4px}
+.footer{max-width:1180px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:860px){.layout{grid-template-columns:1fr}nav.toc{position:static;max-height:none}
+article{padding:12px 18px 40px}}
+</style></head>
+<body>
+<header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>前処理の工夫とドメイン知識</p></div>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="data-notes.html" class="active">🔬 前処理・データ</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<div class="layout">
+<nav class="toc"><div class="toc-title">目次</div><div class="toc">
+<ul>
+<li><a href="#1">1. データ概要</a></li>
+<li><a href="#2-200">2. 欠損値センチネル -200 の落とし穴（本追試の重要発見）</a></li>
+<li><a href="#3">3. 推奨される正しい前処理</a></li>
+<li><a href="#4-bounds">4. bounds（定義域の上下限）の与え方とドメイン知識</a></li>
+<li><a href="#5">5. シミュレーションデータ側の前処理方針</a></li>
+<li><a href="#6">6. 再現者向けチェックリスト</a></li>
+<li><a href="#_2">参照</a></li>
+</ul>
+</div>
+</nav>
+<article><h1 id="_1">前処理とドメイン特化メモ</h1>
+<p>本ページは、UCI Air Quality データセット <a href="#ref3">[3]</a> を BinAgg <a href="#ref2">[2]</a> の差分プライバシー（DP）線形回帰で扱う際の前処理を、再現者が同じ落とし穴を踏まないようにまとめた実務ノートである。特に欠損値センチネル <code>-200</code> の扱いは、本追試で有用性指標の信頼性を左右した重要発見なので、節を分けて詳述する。</p>
+<h2 id="1">1. データ概要</h2>
+<p>同梱 CSV <code>data/AirQualityUCI.csv</code> <a href="#ref3">[3]</a> を対象とする。1 時間ごとのイタリア・大気質観測で、目的変数は <strong>CO(GT)</strong>（一酸化炭素の真値, mg/m³）、特徴量は以下の 12 次元である。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>列名</th>
+<th>種別</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>PT08.S1(CO)</td>
+<td>センサ応答</td>
+</tr>
+<tr>
+<td>2</td>
+<td>NMHC(GT)</td>
+<td>真値</td>
+</tr>
+<tr>
+<td>3</td>
+<td>C6H6(GT)</td>
+<td>真値</td>
+</tr>
+<tr>
+<td>4</td>
+<td>PT08.S2(NMHC)</td>
+<td>センサ応答</td>
+</tr>
+<tr>
+<td>5</td>
+<td>NOx(GT)</td>
+<td>真値</td>
+</tr>
+<tr>
+<td>6</td>
+<td>PT08.S3(NOx)</td>
+<td>センサ応答</td>
+</tr>
+<tr>
+<td>7</td>
+<td>NO2(GT)</td>
+<td>真値</td>
+</tr>
+<tr>
+<td>8</td>
+<td>PT08.S4(NO2)</td>
+<td>センサ応答</td>
+</tr>
+<tr>
+<td>9</td>
+<td>PT08.S5(O3)</td>
+<td>センサ応答</td>
+</tr>
+<tr>
+<td>10</td>
+<td>T</td>
+<td>温度</td>
+</tr>
+<tr>
+<td>11</td>
+<td>RH</td>
+<td>相対湿度</td>
+</tr>
+<tr>
+<td>12</td>
+<td>AH</td>
+<td>絶対湿度</td>
+</tr>
+</tbody>
+</table>
+<p>ファイル形式に固有のクセが 2 つある。</p>
+<ul>
+<li>フィールド区切りが <code>,</code> ではなく <strong><code>;</code></strong>（<code>sep=';'</code>）。</li>
+<li>小数点が <strong>カンマ表記</strong>（例: <code>2,6</code> は <code>2.6</code> の意）。読み込み前に各数値フィールドで <code>,</code> → <code>.</code> 変換が必要。</li>
+</ul>
+<blockquote>
+<p>⚠️ 落とし穴: <code>pd.read_csv</code> でデフォルト（<code>sep=','</code>）のまま読むと 1 列に潰れる。さらに区切りを直しても、カンマ小数を変換しないと <code>to_numeric</code> がほぼ全行を <code>NaN</code> 化する。<code>sep=';'</code> と <code>decimal=','</code> を同時に指定するか、文字列置換 → <code>to_numeric</code> の二段で処理する。</p>
+</blockquote>
+<h2 id="2-200">2. 欠損値センチネル <code>-200</code> の落とし穴（本追試の重要発見）</h2>
+<p>このデータセットは <strong>欠損を実数値 <code>-200</code> で表現する</strong>（<code>NaN</code> ではない）。ここが最大の罠である。</p>
+<p>BinAgg 同梱 example のクリーニングは、おおむね <code>pd.to_numeric(..., errors='coerce')</code> 後に <code>dropna()</code> するだけで、<strong><code>-200</code> を欠損として除去しない</strong>。結果、<code>-200</code> が正常値のふりをして解析に流れ込む。CO(GT) 列では全 9357 行のうち <strong>1683 行</strong>（約 18%）が <code>-200</code> である。</p>
+<p>この汚染は目的変数 <span class="arithmatex">\(y\)</span> の分布を直接歪める。生の <span class="arithmatex">\(y\)</span>（<code>-200</code> を残したまま）と、定義域 <span class="arithmatex">\((0, 15)\)</span> でクリップした後の統計量を比べると差は歴然である。</p>
+<div class="arithmatex">\[
+\bar{y}_{\text{raw}} = -34.21,\quad s_{\text{raw}} = 77.65
+\qquad\Longrightarrow\qquad
+\bar{y}_{\text{clip}} = 1.766,\quad s_{\text{clip}} = 1.554
+\]</div>
+<p>生の平均が負になっているのは、本来 0–15 程度の濃度に大量の <code>-200</code> が混ざるためで、物理的にあり得ない値である。</p>
+<p>具体的な悪影響は 2 系統に分かれる。</p>
+<ul>
+<li><strong>(a) 合成データのモーメント比較が無意味になる。</strong> DP 合成側はクリップ後の妥当な範囲で値を出すのに、参照を生の <span class="arithmatex">\(y\)</span> にすると mean 誤差が 36 程度の巨大値になる。これは手法の良し悪しではなく、参照側の汚染を見ているだけである。</li>
+<li><strong>(b) 非プライベート OLS 参照そのものが汚染される。</strong> <code>-200</code> を含む行で最小二乗を解くと係数が引っ張られる（例: AH 係数が <span class="arithmatex">\(-0.895\)</span> といった、汚染下でしか出ない値になる）。DP 経路は bounds クリップで <code>-200</code> の一部が遮蔽されるため被害が軽く見えるが、これは本質的な解決ではなく、たまたまクリップが効いているだけである。</li>
+</ul>
+<blockquote>
+<p>💡 推奨: <code>-200</code> は読み込み直後に <code>NaN</code> へ置換し（<code>df.replace(-200, np.nan)</code>）、各列で欠損行を落としてから一切の統計・回帰・参照計算に入る。クリップは bounds 違反の救済策であって、欠損除去の代替にはならない。</p>
+</blockquote>
+<h2 id="3">3. 推奨される正しい前処理</h2>
+<p>原則はシンプルで、<strong><code>-200</code> を含む行を当該列の欠損として除去してから解析する</strong>。列ごとに欠損行が異なるため、解析に使う列だけを対象に行除去する（全列一括 <code>dropna</code> だと残行が過度に減ることがある）。</p>
+<p>本追試では時間の制約上、暫定対応として「<strong>合成モーメントはクリップ後の元データ基準で比較する</strong>」ことで上記 (a) を回避した。一方 (b) の OLS 参照汚染は除去しきれずに残ったため、E3 の DP-OLS 係数一致は <strong>有用性指標として信頼できない</strong>と限界に明記している。再現する場合は暫定策に頼らず、最初から <code>-200</code> 除去を済ませた上で参照・合成の双方を再計算することを強く勧める。</p>
+<blockquote>
+<p>⚠️ 落とし穴: 「クリップで <code>-200</code> が <span class="arithmatex">\((0,15)\)</span> の下端 0 に丸められるから大丈夫」という発想は誤り。0 も有効な観測値なので、欠損が 0 に化けることで分布が下方向に偏る。クリップは欠損処理の代わりにはならない。</p>
+</blockquote>
+<h2 id="4-bounds">4. bounds（定義域の上下限）の与え方とドメイン知識</h2>
+<p>DP では各特徴・目的の <strong>bounds（クリップ範囲）をデータの min/max から決めてはならない</strong>。実データの極値はそれ自体が個人の情報であり、min/max を bounds に使うとプライバシー漏えいになる。bounds は<strong>解析者がドメイン知識から外生的に与える</strong>べき量である。</p>
+<p>BinAgg example 準拠の bounds は以下の通り（単位はデータの記録系に従う）。</p>
+<table>
+<thead>
+<tr>
+<th>変数</th>
+<th>下限</th>
+<th>上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>センサ応答（PT08.S*）</td>
+<td>0</td>
+<td>3000</td>
+</tr>
+<tr>
+<td>NMHC(GT)</td>
+<td>0</td>
+<td>1500</td>
+</tr>
+<tr>
+<td>C6H6(GT)</td>
+<td>0</td>
+<td>100</td>
+</tr>
+<tr>
+<td>NOx(GT)</td>
+<td>0</td>
+<td>2000</td>
+</tr>
+<tr>
+<td>NO2(GT)</td>
+<td>0</td>
+<td>500</td>
+</tr>
+<tr>
+<td>T（温度）</td>
+<td>−20</td>
+<td>50</td>
+</tr>
+<tr>
+<td>RH（相対湿度）</td>
+<td>0</td>
+<td>100</td>
+</tr>
+<tr>
+<td>AH（絶対湿度）</td>
+<td>0</td>
+<td>3</td>
+</tr>
+<tr>
+<td>CO(GT)（目的）</td>
+<td>0</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+<p><code>clip=True</code> を指定すると bounds 外の値は端点に丸められる。前節の通りこれは <code>-200</code> を 0 へ寄せる副作用を持つので、<strong>欠損除去を先に済ませてから clip を効かせる</strong>順序が重要である。</p>
+<blockquote>
+<p>💡 推奨: 温度 T のように下限が負になる量があるため、「特徴は非負」と決め打ちしないこと。各列の物理的にあり得る範囲を個別に設定する。湿度 RH の上限が 100（%）であることなど、単位の確認も忘れない。</p>
+</blockquote>
+<h2 id="5">5. シミュレーションデータ側の前処理方針</h2>
+<p>合成・検証用のシミュレーションデータでは、生成分布が既知なので bounds 設定で悩む必要はない。例えば</p>
+<div class="arithmatex">\[
+X \sim \mathrm{Uniform}(0, 10)^3
+\]</div>
+<p>のように生成するなら、bounds はその<strong>既知の生成範囲 <span class="arithmatex">\([0, 10]\)</span> から直接与える</strong>。実データと違い観測 min/max を覗く誘惑がそもそも存在せず、bounds は完全にデータ非依存に決まる。これが DP の前提（bounds は外生）と自然に整合するため、手法の素性を確認する用途に向く。</p>
+<h2 id="6">6. 再現者向けチェックリスト</h2>
+<ul>
+<li>[ ] 区切りは <code>;</code>（<code>sep=';'</code>）で読み込んだか</li>
+<li>[ ] カンマ小数（<code>2,6</code> → <code>2.6</code>）を変換したか</li>
+<li>[ ] 欠損センチネル <code>-200</code> を <code>NaN</code> 化し、使用列の欠損行を除去したか</li>
+<li>[ ] 除去を<strong>統計・回帰・参照計算より前</strong>に済ませたか</li>
+<li>[ ] bounds をデータの min/max ではなくドメイン知識から与えたか</li>
+<li>[ ] <code>clip=True</code> の丸め挙動を確認し、欠損除去後に clip を適用したか</li>
+<li>[ ] 合成モーメント比較の参照が（生ではなく）クリーニング後データになっているか</li>
+</ul>
+<h2 id="_2">参照</h2>
+<ol class="refs">
+<li id="ref2">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27). <a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
+<li id="ref3">UCI Machine Learning Repository — Air Quality Data Set（同梱 <code>data/AirQualityUCI.csv</code>）.</li>
+</ol></article>
+</div>
+<div class="footer">BinAgg 再現追試 · 前処理の工夫とドメイン知識 · build: scripts/03_build_html.py · source: <code>content/data-notes.md</code></div>
+</body></html>
