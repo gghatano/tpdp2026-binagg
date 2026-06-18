@@ -1,0 +1,113 @@
+{
+  "metric_relmse": "||X*beta - y||^2 / ||y||^2 (prediction; robust)",
+  "metric_coef": "||beta_dp - beta_ols||_2 / ||beta_ols||_2 (coefficient; fragile on ill-conditioned designs)",
+  "bounds": "non-private per-column data min/max",
+  "n_reps": 20,
+  "variants": {
+    "keep (paper)": {
+      "n": 9357,
+      "d": 12,
+      "ols_relmse": 0.44125860308425474,
+      "rows": [
+        {
+          "mu": 0.5,
+          "binagg_relmse_mean": 0.5057334271804553,
+          "binagg_relmse_std": 0.01852698237305899,
+          "coef_relL2_mean": 0.9664790769980396,
+          "coef_relL2_std": 0.16284787134724205
+        },
+        {
+          "mu": 1.0,
+          "binagg_relmse_mean": 0.4500277128040396,
+          "binagg_relmse_std": 0.0064329897593707495,
+          "coef_relL2_mean": 0.9127494234575314,
+          "coef_relL2_std": 0.09770722288593436
+        },
+        {
+          "mu": 2.0,
+          "binagg_relmse_mean": 0.4433489693704005,
+          "binagg_relmse_std": 0.0007172882325841857,
+          "coef_relL2_mean": 0.9627147848225401,
+          "coef_relL2_std": 0.13073426583229236
+        },
+        {
+          "mu": 5.0,
+          "binagg_relmse_mean": 0.4437967465438099,
+          "binagg_relmse_std": 0.000536444532115858,
+          "coef_relL2_mean": 0.8384506090245795,
+          "coef_relL2_std": 0.15624719349295987
+        }
+      ]
+    },
+    "drop_rows": {
+      "n": 6941,
+      "d": 11,
+      "ols_relmse": 0.0275073294128654,
+      "rows": [
+        {
+          "mu": 0.5,
+          "binagg_relmse_mean": 0.07613056513967728,
+          "binagg_relmse_std": 0.027347738997261808,
+          "coef_relL2_mean": 4.2734964962314965,
+          "coef_relL2_std": 3.425773666997756
+        },
+        {
+          "mu": 1.0,
+          "binagg_relmse_mean": 0.049942182348891695,
+          "binagg_relmse_std": 0.011182723335351585,
+          "coef_relL2_mean": 3.2879759779753868,
+          "coef_relL2_std": 2.2060245089403008
+        },
+        {
+          "mu": 2.0,
+          "binagg_relmse_mean": 0.03601899190670054,
+          "binagg_relmse_std": 0.003001488593872071,
+          "coef_relL2_mean": 2.3213725819822053,
+          "coef_relL2_std": 1.382332401411456
+        },
+        {
+          "mu": 5.0,
+          "binagg_relmse_mean": 0.03150752801966426,
+          "binagg_relmse_std": 0.0007987173539900647,
+          "coef_relL2_mean": 1.9524969044839682,
+          "coef_relL2_std": 0.8775698130514938
+        }
+      ]
+    },
+    "impute": {
+      "n": 7674,
+      "d": 12,
+      "ols_relmse": 0.03543931663986741,
+      "rows": [
+        {
+          "mu": 0.5,
+          "binagg_relmse_mean": 0.08199814501921189,
+          "binagg_relmse_std": 0.022193464503469103,
+          "coef_relL2_mean": 3.4193681898819293,
+          "coef_relL2_std": 3.5633752897337603
+        },
+        {
+          "mu": 1.0,
+          "binagg_relmse_mean": 0.05738467450206741,
+          "binagg_relmse_std": 0.009693074478229726,
+          "coef_relL2_mean": 2.0693385546334553,
+          "coef_relL2_std": 1.7424008993196873
+        },
+        {
+          "mu": 2.0,
+          "binagg_relmse_mean": 0.044255081782213816,
+          "binagg_relmse_std": 0.004019186570135388,
+          "coef_relL2_mean": 2.190700748494467,
+          "coef_relL2_std": 1.192042745824487
+        },
+        {
+          "mu": 5.0,
+          "binagg_relmse_mean": 0.03910372925206286,
+          "binagg_relmse_std": 0.001174137428398518,
+          "coef_relL2_mean": 1.497837484597115,
+          "coef_relL2_std": 0.8325740270437808
+        }
+      ]
+    }
+  }
+}

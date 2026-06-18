@@ -17,6 +17,7 @@ Statistical Guarantees* (Lin, Slavković & Bhoomireddy, AISTATS 2026,
 | 📐 用語と記法 | [content/notation.md](content/notation.md) | 用語・記号の定義 |
 | 🧩 手法詳細 | [content/method-binagg.md](content/method-binagg.md) | BinAgg のアルゴリズムと直感 |
 | 🔬 前処理・データ | [content/data-notes.md](content/data-notes.md) | 前処理の工夫・ドメイン知識・`-200` 知見 |
+| 🧪 補足実験 | [content/supplementary.md](content/supplementary.md) | 欠損処理の選択（行削除・補完）と係数指標での比較 |
 | 🛠 エンジニアリング | [content/engineering-notes.md](content/engineering-notes.md) | 環境構築・再現手順・落とし穴 |
 | ❓ QA・メモ | [content/faq.md](content/faq.md) | よくある疑問と設計判断 |
 

@@ -35,6 +35,8 @@ PAGES = [
      "subtitle": "BinAgg のアルゴリズムと直感"},
     {"md": "data-notes.md", "html": "data-notes.html", "tab": "🔬 前処理・データ",
      "subtitle": "前処理の工夫とドメイン知識"},
+    {"md": "supplementary.md", "html": "supplementary.html", "tab": "🧪 補足実験",
+     "subtitle": "欠損処理の選択と係数指標での比較"},
     {"md": "engineering-notes.md", "html": "engineering-notes.html", "tab": "🛠 エンジニアリング",
      "subtitle": "環境構築・再現手順・落とし穴"},
     {"md": "faq.md", "html": "faq.html", "tab": "❓ QA・メモ",
