@@ -1,0 +1,9 @@
+dataset,design,n,d,cond_XtX,relL2_corrected_mean,relL2_corrected_std,relL2_naive_mean,ci_cover_ols_mean,ci_width_mean
+D2 BUPA,raw,345,6,7.087e+04,3.9661,3.1145,3.4128,0.967,13.7175
+D2 BUPA,standardized,345,6,1.021e+01,5.9090,3.3980,5.0344,1.000,1743.1322
+D5 Parkinsons,raw,5875,21,2.475e+15,1.1974,0.4316,1.1950,0.830,121326.2556
+D5 Parkinsons,standardized,5875,21,5.428e+08,1.0028,0.0265,1.0024,0.906,295.4470
+D9 Superconduct.,raw,21263,81,1.013e+13,1.0236,0.0330,1.0224,0.847,113.3248
+D9 Superconduct.,standardized,21263,81,6.358e+05,1.0369,0.0685,1.0355,0.995,430.6821
+D6 Wine,raw,6497,12,2.878e+07,1.3012,0.3790,1.2898,0.997,37.3394
+D6 Wine,standardized,6497,12,1.578e+02,3.3196,1.7156,3.2679,1.000,34.3262

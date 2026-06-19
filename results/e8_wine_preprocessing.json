@@ -1,0 +1,68 @@
+{
+  "experiment": "E8: Wine Quality preprocessing variants (Issue #3)",
+  "data": "red(1599)+white(4898)=6497 from pinned GitHub mirror (OpenML blocked)",
+  "metric": "RelMSE (no intercept in metric; intercept here means a design column)",
+  "paper_reference": {
+    "D6_OLS": 0.016,
+    "D6_BinAgg": 0.022
+  },
+  "note": "OLS RelMSE is invariant to per-column scaling, so the gap is driven by the design columns (intercept / type), not standardization.",
+  "variants": [
+    {
+      "variant": "E5 baseline: 11 chem + type, no intercept",
+      "with_type": true,
+      "intercept": false,
+      "d": 12,
+      "ols_relmse": 0.015625878578479652,
+      "comment": "matches paper d=12 (this is the current E5 encoding)"
+    },
+    {
+      "variant": "11 chem + type + intercept",
+      "with_type": true,
+      "intercept": true,
+      "d": 13,
+      "ols_relmse": 0.015494647558710956,
+      "comment": "d=13"
+    },
+    {
+      "variant": "11 chem + intercept, NO type",
+      "with_type": false,
+      "intercept": true,
+      "d": 12,
+      "ols_relmse": 0.015591513521153205,
+      "comment": "alt d=12 (intercept replaces the type indicator)"
+    },
+    {
+      "variant": "11 chem only, no intercept",
+      "with_type": false,
+      "intercept": false,
+      "d": 11,
+      "ols_relmse": 0.015644360259442398,
+      "comment": "d=11 (drop type)"
+    }
+  ],
+  "alignment_sensitivity": {
+    "aligned_ols_relmse": 0.015625878578479652,
+    "misaligned_white_perm_ols": {
+      "min": 0.01567947858198208,
+      "median": 0.01741579846744712,
+      "max": 0.030694437813005036,
+      "n_perms": 200
+    }
+  },
+  "binagg_d12_candidates": {
+    "type_noic": {
+      "d": 12,
+      "mean": 0.02118170919168898,
+      "std": 0.0025900222981119192,
+      "n_ok": 30
+    },
+    "intercept_notype": {
+      "d": 12,
+      "mean": 0.020736883791095364,
+      "std": 0.001887194208669367,
+      "n_ok": 30
+    }
+  },
+  "resolution": "aligned canonical red+white CSVs give OLS 0.0156 / BinAgg 0.021 (mu=1), matching the paper's 0.016 / 0.022; the earlier E5 value 0.027 is attributed to the data source / red-white feature-column alignment, not to a preprocessing-column or scaling choice (all design variants give ~0.0156)."
+}

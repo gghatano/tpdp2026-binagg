@@ -125,7 +125,7 @@ BinAgg の値が論文 Table 2 の報告値（0.441 / 0.463）を再現するこ
 <p>これら中核の確認に加え、論文のもう一つの主眼である<strong>合成データの下流 ML 評価</strong>（§5.2.2 / Table 3）や、
 比較手法 <strong>AdaSSP</strong>・他データ（Abalone/Appliances 等）への拡張も best-effort で追試し、いずれも論文と整合する挙動
 （予測精度の桁・プライバシーによる劣化の向き・手法の優劣 BinAgg &lt; AdaSSP）を確認した（<a href="extensions.html">発展実験</a>）。
-残課題は、(a) 競合 DP-SDG 手法（AIM 等）・DP-GD の実装による優劣検証、(b) 同定困難な他データ（D1/D2/D3/D5/D9）と感度分析、
+残課題は、(a) 競合 DP-SDG 手法（AIM 等）・DP-GD の実装による優劣検証、(b) 唯一未同定の他データ D3 と感度分析、
 (c) 悪条件な実計画における係数推定の安定化（標準化・次元削減）であり、一部は補助タブで着手済みである（§7）。</p>
 <hr />
 <h2 id="2">2. イントロダクション</h2>
@@ -461,8 +461,10 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
    再現した（<a href="extensions.html">発展実験</a>、→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/1">#1</a>）。残るは競合 DP-SDG 手法（AIM 等）の実装。</li>
 <li><strong>比較手法</strong>: <strong>AdaSSP</strong> は best-effort で追加し優劣 BinAgg &lt; AdaSSP を再現（<a href="extensions.html">発展実験</a>）。
    <strong>DP-GD</strong> はチューニング感度・コストのため未実施（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/2">#2</a>）。</li>
-<li><strong>データセットの広がり</strong>: 同定できた <strong>Abalone・Appliances</strong> は論文値をほぼ再現、<strong>Wine</strong> は前処理差で乖離。
-   同定困難な D1/D2/D3/D5/D9 は未実施（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/3">#3</a>）。反復は論文と同じ <strong>100</strong> に揃えた。</li>
+<li><strong>データセットの広がり</strong>: 同定できた <strong>Abalone・Appliances</strong> は論文値をほぼ再現、<strong>Wine</strong> の乖離は
+   red/white の列アラインメント由来と判明し<strong>解消</strong>（OLS 0.016 / BinAgg 0.021、<a href="extensions.html">発展実験</a>）。
+   さらに <strong>D1=LT-FS-ID(WSN)・D2=BUPA Liver・D5=Parkinsons Telemonitoring・D9=Superconductivity</strong> を同定し、
+   D2/D5/D9 を best-effort 追試（<strong>D3 のみ未同定</strong>）（→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/3">#3</a>）。反復は論文と同じ <strong>100</strong> に揃えた。</li>
 <li><strong>漸近信頼区間の有限標本近似</strong>: 被覆率が 0.95 を僅かに下回る点の、<span class="arithmatex">\(n\)</span>・bin 数を増やした感度分析は未実施
    （→ <a href="https://github.com/gghatano/tpdp2026-binagg/issues/4">#4</a>）。</li>
 <li><strong>bounds の与え方</strong>: 実データでは論文に倣い non-private な bounds を用いた（DP ではない）。bounds を

@@ -1,0 +1,201 @@
+{
+  "experiment": "E9: coefficient-level OLS vs BinAgg (corrected/naive), mu=1",
+  "reference": "non-private OLS beta (no true beta on real data)",
+  "metrics": {
+    "relL2_corrected": "||beta_binagg - beta_ols|| / ||beta_ols||",
+    "relL2_naive": "||beta_naive - beta_ols|| / ||beta_ols||",
+    "ci_cover_ols": "fraction of coeffs whose BinAgg 95% CI contains beta_ols",
+    "cond_XtX": "condition number of X^T X (ill-conditioning indicator)"
+  },
+  "note": "prediction RelMSE is invariant to standardization; coefficient agreement is not. Large relL2 on raw + small on standardized indicates the gap is driven by design ill-conditioning, not by the DP mechanism per se (cf. Issue #6).",
+  "datasets": {
+    "D2 BUPA": {
+      "raw": {
+        "d": 6,
+        "cond_XtX": 70869.37716262131,
+        "n_ok": 30,
+        "relL2_corrected": [
+          3.9661031577360037,
+          3.1144533929622757
+        ],
+        "relL2_naive": [
+          3.412784657770225,
+          2.631818183986367
+        ],
+        "ci_cover_ols": [
+          0.9666666666666668,
+          0.07934920476158722
+        ],
+        "ci_width": [
+          13.717491544378257,
+          19.432716807616107
+        ],
+        "ols_coef_norm": 0.8414985457705783
+      },
+      "standardized": {
+        "d": 6,
+        "cond_XtX": 10.208763280627023,
+        "n_ok": 30,
+        "relL2_corrected": [
+          5.908979354110731,
+          3.3979724277684773
+        ],
+        "relL2_naive": [
+          5.034395997757474,
+          2.690170555997287
+        ],
+        "ci_cover_ols": [
+          1.0,
+          0.0
+        ],
+        "ci_width": [
+          1743.1321756273903,
+          8794.969315141723
+        ],
+        "ols_coef_norm": 1.318237606399876
+      },
+      "n": 345
+    },
+    "D5 Parkinsons": {
+      "raw": {
+        "d": 21,
+        "cond_XtX": 2475240946902104.5,
+        "n_ok": 30,
+        "relL2_corrected": [
+          1.197374797978694,
+          0.43162352823661304
+        ],
+        "relL2_naive": [
+          1.195043386089538,
+          0.4275534356962522
+        ],
+        "ci_cover_ols": [
+          0.8301587301587303,
+          0.04202603903134516
+        ],
+        "ci_width": [
+          121326.25563564168,
+          300098.0027235753
+        ],
+        "ols_coef_norm": 24181.322258965036
+      },
+      "standardized": {
+        "d": 21,
+        "cond_XtX": 542796982.6666442,
+        "n_ok": 30,
+        "relL2_corrected": [
+          1.0027891135489935,
+          0.026517916779918566
+        ],
+        "relL2_naive": [
+          1.0024189410101274,
+          0.024811941777544987
+        ],
+        "ci_cover_ols": [
+          0.9063492063492065,
+          0.05285976446141814
+        ],
+        "ci_width": [
+          295.4469572239555,
+          497.92416570007396
+        ],
+        "ols_coef_norm": 258.50454916538666
+      },
+      "n": 5875
+    },
+    "D9 Superconduct.": {
+      "raw": {
+        "d": 81,
+        "cond_XtX": 10132878057543.152,
+        "n_ok": 5,
+        "relL2_corrected": [
+          1.023624679245154,
+          0.033047898025154614
+        ],
+        "relL2_naive": [
+          1.0224165866679331,
+          0.0321360015023474
+        ],
+        "ci_cover_ols": [
+          0.8469135802469134,
+          0.10864197530864197
+        ],
+        "ci_width": [
+          113.324802030814,
+          81.63340126279871
+        ],
+        "ols_coef_norm": 196.97436734855003
+      },
+      "standardized": {
+        "d": 81,
+        "cond_XtX": 635822.478188356,
+        "n_ok": 5,
+        "relL2_corrected": [
+          1.036874245456827,
+          0.06852823237865917
+        ],
+        "relL2_naive": [
+          1.035541755980736,
+          0.06685820167537856
+        ],
+        "ci_cover_ols": [
+          0.9950617283950617,
+          0.006048122821686886
+        ],
+        "ci_width": [
+          430.6820895573761,
+          173.92469953150885
+        ],
+        "ols_coef_norm": 197.89275366343995
+      },
+      "n": 21263
+    },
+    "D6 Wine": {
+      "raw": {
+        "d": 12,
+        "cond_XtX": 28781500.350064598,
+        "n_ok": 30,
+        "relL2_corrected": [
+          1.3011843359015294,
+          0.37898191669990267
+        ],
+        "relL2_naive": [
+          1.2898402481635998,
+          0.3724163756015221
+        ],
+        "ci_cover_ols": [
+          0.9972222222222221,
+          0.014958791130929181
+        ],
+        "ci_width": [
+          37.339434652794935,
+          50.62636491866384
+        ],
+        "ols_coef_norm": 3.035599298584899
+      },
+      "standardized": {
+        "d": 12,
+        "cond_XtX": 157.75696584899245,
+        "n_ok": 30,
+        "relL2_corrected": [
+          3.319596548916244,
+          1.7155698831339998
+        ],
+        "relL2_naive": [
+          3.2679061648794447,
+          1.661702723301697
+        ],
+        "ci_cover_ols": [
+          1.0,
+          0.0
+        ],
+        "ci_width": [
+          34.32623407532399,
+          66.27818895446211
+        ],
+        "ols_coef_norm": 0.6207157750099721
+      },
+      "n": 6497
+    }
+  }
+}
