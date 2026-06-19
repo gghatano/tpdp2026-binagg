@@ -9,8 +9,9 @@
 対象は tpdp2026 Issue #16。
 
 > 📘 本ページは論文体のレポート本体である。用語の定義は「[用語と記法](notation.html)」、手法の詳細は
-> 「[BinAgg 手法詳細](method-binagg.html)」、データ前処理とドメイン知識は「[前処理とドメイン特化メモ](data-notes.html)」、
-> 環境構築・再現手順は「[エンジニアリングと再現手順](engineering-notes.html)」、よくある疑問は「[QA・メモ](faq.html)」に分けて掲載している。
+> 「[BinAgg 手法詳細](method-binagg.html)」、分割アルゴリズムは「[PrivTree](privtree.html)」、データ前処理とドメイン知識は
+> 「[前処理とドメイン特化メモ](data-notes.html)」、環境構築・再現手順は「[エンジニアリングと再現手順](engineering-notes.html)」、
+> よくある疑問は「[QA・メモ](faq.html)」に分けて掲載している。
 
 実行環境: Python 3.12.12 / numpy 2.4.6 / scipy 1.17.1 / pandas 3.0.3。全乱数はシード固定。
 本レポートの数値は `results/` の生成物に対応する（再現手順は[エンジニアリングと再現手順](engineering-notes.html)を参照）。
@@ -60,9 +61,10 @@ best-effort の発展実験として別途まとめた（[発展実験](extensio
 ## 3. 関連技術・対象手法の概要
 
 BinAgg（Binning-Aggregation）は μ-GDP（Gaussian Differential Privacy。$\mu$ が小さいほど強い保護 [[1]](#ref1)）
-の下で、(1) PrivTree でデータ空間を private に分割（binning）、(2) 各 bin の件数・特徴量の和・目的変数の和に
+の下で、(1) [PrivTree](privtree.html) [[4]](#ref4) でデータ空間を private に分割（binning）、(2) 各 bin の件数・特徴量の和・目的変数の和に
 Gaussian ノイズを加える、(3) ノイズ入り集約からバイアス補正済みの重み付き最小二乗で回帰する、という流れを取る [[1]](#ref1)[[2]](#ref2)。
-点推定と信頼区間は次式で与えられる（記号は[用語と記法](notation.html)、導出と直感は[BinAgg 手法詳細](method-binagg.html)を参照）。
+点推定と信頼区間は次式で与えられる（記号は[用語と記法](notation.html)、導出と直感は[BinAgg 手法詳細](method-binagg.html)、
+分割の詳細は [PrivTree](privtree.html) を参照）。
 
 $$\tilde\beta = \bigl(\tilde S^\top \tilde W \tilde S - \tilde D\bigr)^{-1}\tilde S^\top \tilde W \tilde t,
 \qquad \tilde\Sigma = \tilde M^{-1}\,\tilde H\,\tilde M^{-1}.$$
@@ -275,4 +277,5 @@ E3 は論文の実データ設定に準拠して予測 RelMSE で Table 2 の値
 <li id="ref1">Lin, S., Slavković, A., &amp; Bhoomireddy, D. R. (2026). <em>Differentially Private Linear Regression and Synthetic Data Generation with Statistical Guarantees.</em> AISTATS 2026 (PMLR). arXiv:2510.16974. <a href="https://arxiv.org/abs/2510.16974">https://arxiv.org/abs/2510.16974</a></li>
 <li id="ref2">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27). <a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
 <li id="ref3">UCI Machine Learning Repository — Air Quality Data Set（同梱 <code>data/AirQualityUCI.csv</code>）.</li>
+<li id="ref4">Zhang, J., Xiao, X., &amp; Xie, X. (2016). <em>PrivTree: A Differentially Private Algorithm for Hierarchical Decompositions.</em> ACM SIGMOD 2016, pp. 155–170. <a href="https://doi.org/10.1145/2882903.2882928">https://doi.org/10.1145/2882903.2882928</a>（BinAgg の binning が用いる分割アルゴリズム。詳細は[PrivTree](privtree.html)）</li>
 </ol>

@@ -33,6 +33,8 @@ PAGES = [
      "subtitle": "本文で使う用語・記号の定義"},
     {"md": "method-binagg.md", "html": "method-binagg.html", "tab": "🧩 手法詳細",
      "subtitle": "BinAgg のアルゴリズムと直感"},
+    {"md": "privtree.md", "html": "privtree.html", "tab": "🌳 PrivTree",
+     "subtitle": "DP な空間分割アルゴリズムと BinAgg での役割"},
     {"md": "data-notes.md", "html": "data-notes.html", "tab": "🔬 前処理・データ",
      "subtitle": "前処理の工夫とドメイン知識"},
     {"md": "supplementary.md", "html": "supplementary.html", "tab": "🧪 補足実験",
