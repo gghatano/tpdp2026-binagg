@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PrivTree — BinAgg 再現追試</title>
+
+<script>
+window.MathJax = {
+  tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]],
+        processEscapes: true, processEnvironments: true},
+  options: {ignoreHtmlClass: ".*|", processHtmlClass: "arithmatex"}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<style>
+:root{--fg:#1a1a1a;--muted:#666;--accent:#c0392b;--link:#1565c0;--line:#e3e3e3;
+--bg:#f3f4f6;--card:#fff;--code:#f6f8fa;--sidebar:#fbfbfc;--chip:#eef4fb;--chipline:#cfe0f3}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;line-height:1.85}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+/* hero + tabs */
+.hero{background:linear-gradient(135deg,#2c3e50 0%,#c0392b 130%);color:#fff}
+.hero .inner{max-width:1180px;margin:0 auto;padding:26px 20px 0}
+.hero h1{margin:0 0 4px;font-size:1.6rem}
+.hero p{margin:0 0 16px;opacity:.92;font-size:.95rem}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs a{color:#fff;background:rgba(255,255,255,.14);padding:8px 14px;border-radius:8px 8px 0 0;
+font-size:.9rem;white-space:nowrap}
+nav.tabs a:hover{background:rgba(255,255,255,.26);text-decoration:none}
+nav.tabs a.active{background:var(--bg);color:var(--accent);font-weight:600}
+/* layout */
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px 40px;display:grid;
+grid-template-columns:250px 1fr;gap:32px}
+nav.toc{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;
+background:var(--sidebar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+nav.toc .toc-title{font-weight:700;margin-bottom:6px}
+nav.toc ul{list-style:none;margin:0;padding-left:0}
+nav.toc li{margin:2px 0}
+nav.toc a{color:var(--muted);display:block;padding:2px 6px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+nav.toc a:hover{color:var(--accent);background:#fff;text-decoration:none}
+nav.toc ul ul a{padding-left:18px;font-size:12.5px}
+/* article card */
+article{background:var(--card);border:1px solid var(--line);border-radius:10px;
+box-shadow:0 1px 10px rgba(0,0,0,.04);padding:12px 40px 56px;min-width:0}
+article>h1:first-of-type{display:none}
+article :is(h2,h3,h4){scroll-margin-top:16px}
+article h2{font-size:1.45rem;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:1.9em}
+article h3{font-size:1.16rem;margin-top:1.6em}
+article h4{font-size:1rem;color:var(--accent)}
+code{background:var(--code);padding:.12em .4em;border-radius:6px;font-size:88%;
+font-family:"Cascadia Code",Consolas,"SF Mono",monospace}
+pre{background:var(--code);padding:14px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 13px}
+th{background:#f2f4f7}
+tr:nth-child(2n){background:#fbfbfc}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin:1.2em auto;display:block}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:4px solid var(--accent);
+background:#fdf3f2;border-radius:0 8px 8px 0;color:#333}
+hr{border:none;border-top:1px solid var(--line);margin:2.2em 0}
+/* citation chips */
+a[href^="#ref"]{font-size:.72em;vertical-align:super;line-height:0;background:var(--chip);
+border:1px solid var(--chipline);border-radius:4px;padding:0 4px;color:var(--link);text-decoration:none}
+a[href^="#ref"]:hover{background:#dceaf8}
+ol.refs{font-size:.92rem;color:#333;padding-left:1.4em}
+ol.refs li{margin:.4em 0}
+ol.refs li:target{background:#fff6d6;border-radius:4px}
+.footer{max-width:1180px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:860px){.layout{grid-template-columns:1fr}nav.toc{position:static;max-height:none}
+article{padding:12px 18px 40px}}
+</style></head>
+<body>
+<header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>DP な空間分割アルゴリズムと BinAgg での役割</p></div>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="privtree.html" class="active">🌳 PrivTree</a><a href="data-notes.html">🔬 前処理・データ</a><a href="supplementary.html">🧪 補足実験</a><a href="extensions.html">📈 発展実験</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<div class="layout">
+<nav class="toc"><div class="toc-title">目次</div><div class="toc">
+<ul>
+<li><a href="#1">1. 何を解く道具か（一言で）</a></li>
+<li><a href="#2">2. なぜ素朴な階層分割では困るのか</a></li>
+<li><a href="#3-binagg">3. アルゴリズム（BinAgg 実装に即して）</a><ul>
+<li><a href="#31-2">3.1 2 つの仕掛けがなぜ「深さ非依存」を生むか</a></li>
+<li><a href="#32">3.2 パラメータの意味</a></li>
+</ul>
+</li>
+<li><a href="#4-binagg">4. BinAgg における役割と本追試での観察</a></li>
+<li><a href="#_1">参照</a></li>
+</ul>
+</div>
+</nav>
+<article><h1 id="privtree-dp">PrivTree とは — DP な空間分割アルゴリズム</h1>
+<blockquote>
+<p>📘 出典: 本ページは PrivTree 原論文 <a href="#ref1">[1]</a>、BinAgg 原論文 <a href="#ref2">[2]</a>、BinAgg 実装 <a href="#ref3">[3]</a>
+（<code>binagg/binning.py</code>）に基づく。BinAgg 全体での位置づけは「<a href="method-binagg.html">BinAgg 手法詳細</a>」を参照。</p>
+</blockquote>
+<p>BinAgg は「データ空間を <strong>bin</strong>（小領域）に分割してから、bin 単位の集約量にノイズを足す」二段構えを取る
+（<a href="method-binagg.html">手法詳細 §2</a>）。このとき、<strong>分割の境界そのものをデータから決める</strong>と、境界の位置が個々のレコードの
+有無を漏らしてしまう。そこで BinAgg は分割自体を差分プライバシー (DP) の下で行う。その分割アルゴリズムが <strong>PrivTree</strong> <a href="#ref1">[1]</a> である。</p>
+<hr />
+<h2 id="1">1. 何を解く道具か（一言で）</h2>
+<p>PrivTree は、<strong>データ空間を再帰的に分割した木（階層的分割）を、DP を満たしながら作る</strong>汎用アルゴリズムである <a href="#ref1">[1]</a>。
+密度の高い領域は細かく、疎な領域は粗く分割する。ヒストグラム・空間索引・range query など「データ密度に応じた適応的グリッド」を
+DP で作りたい場面で広く使える。BinAgg では、得られた各 bin（葉ノードの矩形領域）ごとに <span class="arithmatex">\(\mathrm{count}\)</span>・<span class="arithmatex">\(\mathrm{sum}(X)\)</span>・
+<span class="arithmatex">\(\mathrm{sum}(y)\)</span> を集約し、回帰と合成データ生成に用いる <a href="#ref2">[2]</a>。</p>
+<blockquote>
+<p>💡 直感: 一様な格子で切ると、点の少ない領域は無駄に細かく、点の多い領域は粗すぎる。PrivTree は「点が多い箱だけさらに割る」を
+DP の下で安全に繰り返し、データの形に沿った分割を得る。</p>
+</blockquote>
+<hr />
+<h2 id="2">2. なぜ素朴な階層分割では困るのか</h2>
+<p>「各ノードで点数を数え、多ければさらに分割する」を素朴に DP 化しようとすると、<strong>木の深さ（レベル数）だけ繰り返し count を
+公開する</strong>ことになる。DP の合成則では、<span class="arithmatex">\(h\)</span> 段の分割に予算を配ると各段は <span class="arithmatex">\(\varepsilon/h\)</span> しか使えず、深い木ほど 1 段あたりの
+ノイズが大きくなって分割がガタガタになる。木の高さを事前に決め打ちする必要も生じる。</p>
+<p>PrivTree の核心的な貢献は、<strong>総プライバシー予算が木の深さに依存しない</strong>点である <a href="#ref1">[1]</a>。深さを増やしても <span class="arithmatex">\(\varepsilon\)</span> を
+分割し直す必要がなく、適応的にいくらでも深く割れる。これを 2 つの仕掛けで実現する（§3）。</p>
+<hr />
+<h2 id="3-binagg">3. アルゴリズム（BinAgg 実装に即して）</h2>
+<p>分割対象の領域をキューに入れ、取り出すたびに「割るか・葉にするか」を判定する幅優先の手続きである <a href="#ref3">[3]</a>。
+分岐数 <span class="arithmatex">\(\beta\)</span>（既定 <span class="arithmatex">\(\beta=2\)</span> の二分割）と分割予算 <span class="arithmatex">\(\varepsilon\)</span>（<span class="arithmatex">\(\mu\)</span>-GDP の binning 予算 <span class="arithmatex">\(\mu_{\text{bin}}\)</span> を
+<span class="arithmatex">\(\varepsilon\)</span> に換算 <a href="#ref2">[2]</a>）から、次の 2 定数を決める。</p>
+<div class="arithmatex">\[
+\lambda = \frac{2\beta - 1}{(\beta - 1)\,\varepsilon},
+\qquad
+\delta = \lambda \,\ln\beta .
+\]</div>
+<p>各ノード（領域）について、含まれる点数 <span class="arithmatex">\(n_v\)</span> と深さ <span class="arithmatex">\(\ell\)</span> から<strong>スコア</strong>を作り、ノイズを加えて閾値 <span class="arithmatex">\(\theta\)</span> と比較する。</p>
+<div class="arithmatex">\[
+\underbrace{b_v = n_v - \delta\,\ell}_{\text{深さペナルティ}},
+\qquad
+\underbrace{\hat b_v = \max\!\bigl(b_v,\ \theta - \delta\bigr)}_{\text{下からの打ち切り}},
+\qquad
+\tilde b_v = \hat b_v + \mathrm{Laplace}(\lambda).
+\]</div>
+<ul>
+<li><span class="arithmatex">\(\tilde b_v &gt; \theta\)</span> なら<strong>分割</strong>する。実装は最も幅の広い次元を選び、その中点で 2 分割して子ノードをキューに戻す <a href="#ref3">[3]</a>。</li>
+<li>そうでなければ<strong>葉</strong>として確定し、その領域を 1 つの bin にする。</li>
+</ul>
+<p>判定後、葉が少なすぎる場合は <code>min_bins</code>（既定 <span class="arithmatex">\(d+1\)</span>）に達するまで最大の bin を強制分割する（回帰に必要な最小限の解像度を確保する後処理）<a href="#ref3">[3]</a>。</p>
+<h3 id="31-2">3.1 2 つの仕掛けがなぜ「深さ非依存」を生むか</h3>
+<ul>
+<li><strong>深さペナルティ</strong> <span class="arithmatex">\(-\delta\ell\)</span>: 深いノードほどスコアを下げ、際限ない深掘りを抑える。<span class="arithmatex">\(\delta=\lambda\ln\beta\)</span> という値は、
+  分岐で増える子ノード数（<span class="arithmatex">\(\beta\)</span> 倍）の効果をちょうど相殺するよう設計されている <a href="#ref1">[1]</a>。</li>
+<li><strong>下からの打ち切り</strong> <span class="arithmatex">\(\hat b_v=\max(b_v,\ \theta-\delta)\)</span>: スコアを <span class="arithmatex">\(\theta-\delta\)</span> 未満にしないことで、1 レコードの増減が
+  経路上の全ノードのスコアに与える影響（感度）を<strong>深さによらず定数</strong>に抑える。</li>
+</ul>
+<p>この 2 つにより、木全体での隣接データセット間のスコア変化の総量が深さに依存せず有界になり、<strong>各ノードに <span class="arithmatex">\(\lambda\)</span> の
+Laplace ノイズを 1 回足すだけ</strong>で木全体が <span class="arithmatex">\(\varepsilon\)</span>-DP を満たす <a href="#ref1">[1]</a>。「段ごとに予算を割る」発想からの脱却がポイントである。</p>
+<blockquote>
+<p>💡 直感: 深く割るほどスコアを少しずつ引き、かつ下限で頭打ちにする——この「減衰＋打ち切り」のおかげで、何段割っても
+「1 人が結果に効く量」が増えない。だから深さで予算を割らずに済む。</p>
+</blockquote>
+<h3 id="32">3.2 パラメータの意味</h3>
+<table>
+<thead>
+<tr>
+<th>記号</th>
+<th>実装名</th>
+<th>意味</th>
+<th style="text-align: right;">既定/与え方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\beta\)</span></td>
+<td><code>branching_factor</code></td>
+<td>分岐数（2 で二分割）</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\theta\)</span></td>
+<td><code>theta</code></td>
+<td>分割の閾値。小さい（負）ほど積極的に割る</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\varepsilon\)</span></td>
+<td>—</td>
+<td>分割予算（<span class="arithmatex">\(\mu_{\text{bin}}\)</span> から換算）</td>
+<td style="text-align: right;"><span class="arithmatex">\(\mu\)</span> 配分の約 10%</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\lambda\)</span></td>
+<td><code>lambda_</code></td>
+<td>Laplace ノイズ尺度 <span class="arithmatex">\(=(2\beta{-}1)/((\beta{-}1)\varepsilon)\)</span></td>
+<td style="text-align: right;">上式</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\delta\)</span></td>
+<td><code>delta_depth</code></td>
+<td>深さペナルティ <span class="arithmatex">\(=\lambda\ln\beta\)</span></td>
+<td style="text-align: right;">上式</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>min_bins</code></td>
+<td>最小 bin 数（不足なら強制分割）</td>
+<td style="text-align: right;"><span class="arithmatex">\(d+1\)</span></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 注意: 分割は DP だが、分割対象の<strong>領域の外枠</strong>（各特徴の上下限 <code>x_bounds</code>）はデータから計算してはならない。
+データ依存の境界は漏えい経路になる（<a href="method-binagg.html">手法詳細</a>・<a href="data-notes.html">前処理・データ</a>）。本追試の実データ評価が
+non-private bounds で「DP ではない」と明記しているのはこのためである。</p>
+</blockquote>
+<hr />
+<h2 id="4-binagg">4. BinAgg における役割と本追試での観察</h2>
+<p>PrivTree は BinAgg のパイプライン先頭（Algorithm 1 の binning ステップ）に位置し、総予算 <span class="arithmatex">\(\mu\)</span> のうち分割に約 10% を割く
+（残り 90% は count・<span class="arithmatex">\(\mathrm{sum}_x\)</span>・<span class="arithmatex">\(\mathrm{sum}_y\)</span> の集約に配分）<a href="#ref2">[2]</a>（<a href="method-binagg.html">手法詳細 §2.2</a>）。</p>
+<ul>
+<li><strong><span class="arithmatex">\(\mu\)</span> を上げる</strong>と分割予算も増えてノイズ <span class="arithmatex">\(\lambda\)</span> が小さくなり、より細かい bin が得られる（解像度↑、推定精度↑）。</li>
+<li><strong>次元 <span class="arithmatex">\(d\)</span> が大きいと高コスト</strong>: 本追試では D9 Superconductivity（<span class="arithmatex">\(d=81\)</span>）の PrivTree 分割が高コストかつシード依存だったため、
+  反復回数を減らす逸脱を行った（<a href="extensions.html">発展実験 §4</a>）。</li>
+<li><strong>小標本では分割が不安定</strong>: D2 BUPA（<span class="arithmatex">\(n=345\)</span>）では PrivTree 分割のばらつきが BinAgg の分散を押し上げた（<a href="extensions.html">発展実験 §4</a>）。</li>
+</ul>
+<blockquote>
+<p>💡 まとめ: PrivTree は「データの密度に沿った DP な bin を、木の深さに予算を取られずに作る」部品である。BinAgg の
+バイアス補正やサンドイッチ分散（<a href="method-binagg.html">手法詳細 §3</a>）は、この bin 集約にノイズが乗ることを前提に組まれている。</p>
+</blockquote>
+<hr />
+<h2 id="_1">参照</h2>
+<ol class="refs">
+<li id="ref1">Zhang, J., Xiao, X., &amp; Xie, X. (2016). <em>PrivTree: A Differentially Private Algorithm for Hierarchical Decompositions.</em> ACM SIGMOD 2016, pp. 155–170. <a href="https://doi.org/10.1145/2882903.2882928">https://doi.org/10.1145/2882903.2882928</a></li>
+<li id="ref2">Lin, S., Slavković, A., &amp; Bhoomireddy, D. R. (2026). <em>Differentially Private Linear Regression and Synthetic Data Generation with Statistical Guarantees.</em> AISTATS 2026 (PMLR). arXiv:2510.16974. <a href="https://arxiv.org/abs/2510.16974">https://arxiv.org/abs/2510.16974</a></li>
+<li id="ref3">BinAgg (Python package). Shuronglin/BinAgg, commit 13c09bb (2026-05-27)。本ページのアルゴリズム記述は <code>binagg/binning.py</code> の <code>privtree_binning</code> に対応。<a href="https://github.com/Shuronglin/BinAgg">https://github.com/Shuronglin/BinAgg</a></li>
+</ol></article>
+</div>
+<div class="footer">BinAgg 再現追試 · DP な空間分割アルゴリズムと BinAgg での役割 · build: scripts/03_build_html.py · source: <code>content/privtree.md</code></div>
+</body></html>

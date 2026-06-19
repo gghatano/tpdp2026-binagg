@@ -75,7 +75,7 @@ article{padding:12px 18px 40px}}
 </style></head>
 <body>
 <header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>BinAgg のアルゴリズムと直感</p></div>
-<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html" class="active">🧩 手法詳細</a><a href="data-notes.html">🔬 前処理・データ</a><a href="supplementary.html">🧪 補足実験</a><a href="extensions.html">📈 発展実験</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html">📐 用語と記法</a><a href="method-binagg.html" class="active">🧩 手法詳細</a><a href="privtree.html">🌳 PrivTree</a><a href="data-notes.html">🔬 前処理・データ</a><a href="supplementary.html">🧪 補足実験</a><a href="extensions.html">📈 発展実験</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
 <div class="layout">
 <nav class="toc"><div class="toc-title">目次</div><div class="toc">
 <ul>
@@ -117,7 +117,7 @@ article{padding:12px 18px 40px}}
 <h2 id="2">2. 全体の流れ</h2>
 <p>BinAgg は「private に区間分割（binning）してから、bin 単位の集約量にノイズを足す」という二段構えを取る。</p>
 <h3 id="21-privtree-private">2.1 PrivTree による private 分割</h3>
-<p>まずデータ空間を bin に分割するが、分割境界そのものがデータに依存すると漏えいになる。そこで PrivTree を用いて private に空間を再帰分割する <a href="#ref1">[1]</a>。密度の高い領域は細かく、疎な領域は粗く分割される。</p>
+<p>まずデータ空間を bin に分割するが、分割境界そのものがデータに依存すると漏えいになる。そこで PrivTree を用いて private に空間を再帰分割する <a href="#ref1">[1]</a>。密度の高い領域は細かく、疎な領域は粗く分割される。PrivTree の仕組み（深さに依存しない予算配分・スコアの減衰と打ち切り）は専用ページ「<a href="privtree.html">PrivTree</a>」で詳説する。</p>
 <h3 id="22-bin">2.2 bin 単位の集約にノイズ付与</h3>
 <p>各 bin について <span class="arithmatex">\(\mathrm{count}\)</span>、<span class="arithmatex">\(\mathrm{sum}(X)\)</span>、<span class="arithmatex">\(\mathrm{sum}(y)\)</span> を集計し、それぞれに Gaussian ノイズを加える。総プライバシー予算 <span class="arithmatex">\(\mu\)</span> を以下の 4 要素に配分する（既定値）<a href="#ref2">[2]</a>。</p>
 <ul>

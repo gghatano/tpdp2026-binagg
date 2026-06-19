@@ -75,7 +75,7 @@ article{padding:12px 18px 40px}}
 </style></head>
 <body>
 <header class="hero"><div class="inner"><h1>BinAgg 再現追試</h1><p>本文で使う用語・記号の定義</p></div>
-<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html" class="active">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="data-notes.html">🔬 前処理・データ</a><a href="supplementary.html">🧪 補足実験</a><a href="extensions.html">📈 発展実験</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
+<nav class="tabs"><a href="index.html">📄 レポート</a><a href="notation.html" class="active">📐 用語と記法</a><a href="method-binagg.html">🧩 手法詳細</a><a href="privtree.html">🌳 PrivTree</a><a href="data-notes.html">🔬 前処理・データ</a><a href="supplementary.html">🧪 補足実験</a><a href="extensions.html">📈 発展実験</a><a href="engineering-notes.html">🛠 エンジニアリング</a><a href="faq.html">❓ QA・メモ</a></nav></header>
 <div class="layout">
 <nav class="toc"><div class="toc-title">目次</div><div class="toc">
 <ul>
@@ -122,7 +122,7 @@ article{padding:12px 18px 40px}}
 <p>📘 出典: μ-GDP の定義と <span class="arithmatex">\((\varepsilon,\delta)\)</span>-DP への換算は本手法の前提です <a href="#ref1">[1]</a>。</p>
 </blockquote>
 <h3 id="privtree">PrivTree</h3>
-<p>PrivTree は、データ空間を再帰的に分割して DP を満たす分割（bin 構造）を作るアルゴリズムです。各領域に含まれる点の個数に応じて「さらに分割するか」を DP の下で決め、密な領域は細かく、疎な領域は粗く分割します。BinAgg では、この PrivTree で得た bin ごとに集約量を計算してから回帰を行います <a href="#ref1">[1]</a><a href="#ref2">[2]</a>。</p>
+<p>PrivTree は、データ空間を再帰的に分割して DP を満たす分割（bin 構造）を作るアルゴリズムです。各領域に含まれる点の個数に応じて「さらに分割するか」を DP の下で決め、密な領域は細かく、疎な領域は粗く分割します。BinAgg では、この PrivTree で得た bin ごとに集約量を計算してから回帰を行います <a href="#ref1">[1]</a><a href="#ref2">[2]</a>。アルゴリズムの詳細は専用ページ「<a href="privtree.html">PrivTree</a>」を参照してください。</p>
 <h2 id="_3">集約と回帰の用語</h2>
 <h3 id="bincount-sumx-sumy">bin・集約量（count, sum(X), sum(y)）</h3>
 <p>bin とは、PrivTree で得られた空間の小領域（セル）です。各 bin について、次の 3 種類の集約量を計算します。</p>
